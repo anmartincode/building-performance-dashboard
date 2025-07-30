@@ -11,4 +11,7 @@ matplotlib
 seaborn
 python-dotenv
 requests
-joblib 
+joblib
+sqlalchemy
+pymysql
+cryptography 
