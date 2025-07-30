@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import { AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, ThermometerSun, Shield, Lightbulb, Wind, User, LogOut, Settings, Users, Eye, EyeOff } from 'lucide-react';
+import apiService from './api';
 
 // Advanced ML Models Implementation
 class AdvancedMLModels {
@@ -197,15 +198,30 @@ const LoginForm = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = UserManager.authenticate(credentials.username, credentials.password);
-    if (user) {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const response = await apiService.login(credentials.username, credentials.password);
+      
+      // Create user object with buildings based on role
+      const user = {
+        username: response.user.username,
+        role: response.user.role,
+        buildings: ['building_a', 'building_b', 'building_c'], // All users can see all buildings
+        permissions: UserManager.getPermissions(response.user.role)
+      };
+      
       onLogin(user);
-      setError('');
-    } else {
-      setError('Invalid credentials');
+    } catch (error) {
+      setError('Invalid credentials. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -227,6 +243,7 @@ const LoginForm = ({ onLogin }) => {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter username"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -240,11 +257,13 @@ const LoginForm = ({ onLogin }) => {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter password"
                 required
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                disabled={isLoading}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -259,9 +278,10 @@ const LoginForm = ({ onLogin }) => {
           
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+            disabled={isLoading}
           >
-            Sign In
+            {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
         
@@ -292,50 +312,76 @@ const BuildingDashboard = () => {
 
   useEffect(() => {
     if (currentUser) {
-      setTimeout(() => {
-        const syntheticData = generateAdvancedSyntheticData();
-        setData(syntheticData);
-        
-        // Advanced ML predictions
-        const buildingData = syntheticData.filter(d => d.building === selectedBuilding);
-        const energyValues = buildingData.map(d => d.energyConsumption);
-        const advancedPredictions = AdvancedMLModels.lstmPredict(energyValues);
-        
-        const predictionData = advancedPredictions.map((pred, i) => {
-          const futureDate = new Date();
-          futureDate.setDate(futureDate.getDate() + i + 1);
-          return {
-            date: futureDate.toISOString().split('T')[0],
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          // Fetch building data from API
+          const buildingId = selectedBuilding.toLowerCase().replace(' ', '_');
+          const response = await apiService.getBuildingData(buildingId, selectedTimeRange);
+          
+          // Transform API data to match frontend format
+          const transformedData = response.data.map(item => ({
+            date: new Date(item.timestamp).toISOString().split('T')[0],
+            time: new Date(item.timestamp).toLocaleTimeString(),
             building: selectedBuilding,
-            predictedConsumption: Math.round(pred),
-            confidence: Math.round((88 + Math.random() * 8) * 100) / 100
-          };
-        });
-        
-        setPredictions(predictionData);
-        
-        // Advanced anomaly detection
-        const recentData = buildingData.slice(-50);
-        const detectedAnomalies = recentData.filter(point => {
-          const score = AdvancedMLModels.randomForestAnomaly(recentData, point);
-          return score > 1.5;
-        }).slice(-10);
-        
-        setAnomalies(detectedAnomalies.map(a => ({
-          ...a,
-          anomalyScore: Math.round(AdvancedMLModels.randomForestAnomaly(recentData, a) * 100) / 100,
-          type: a.energyConsumption > 150 ? 'High Usage' : 'Unusual Pattern',
-          severity: AdvancedMLModels.randomForestAnomaly(recentData, a) > 2 ? 'Critical' : 'Warning'
-        })));
-        
-        // K-means clustering
-        const clusterLabels = AdvancedMLModels.kMeansClustering(buildingData.slice(-100));
-        setClusters(clusterLabels);
-        
-        setIsLoading(false);
-      }, 1500);
+            temperature: item.temperature,
+            humidity: item.humidity,
+            energyConsumption: item.energy_consumption,
+            occupancy: item.occupancy,
+            hvacStatus: item.hvac_status,
+            lightingStatus: item.lighting_status,
+            // Calculate derived values
+            cost: item.energy_consumption * 0.12, // $0.12 per kWh
+            hvacEfficiency: Math.max(60, 100 - (item.temperature - 22) * 5),
+            hvacLoad: item.energy_consumption * 0.4,
+            lightingEfficiency: item.lighting_status === 'dimmed' ? 85 : (item.lighting_status === 'on' ? 70 : 95),
+            securityStatus: item.occupancy > 0 ? 'active' : 'standby'
+          }));
+          
+          setData(transformedData);
+          
+          // Fetch AI predictions
+          const predictionsResponse = await apiService.getPredictions(buildingId, 'energy_consumption', 7);
+          const predictionData = predictionsResponse.predictions.map((pred, i) => ({
+            date: new Date(pred.timestamp).toISOString().split('T')[0],
+            building: selectedBuilding,
+            predictedConsumption: Math.round(pred.predicted_value),
+            confidence: Math.round(pred.confidence * 100) / 100
+          }));
+          
+          setPredictions(predictionData);
+          
+          // Fetch anomalies
+          const anomaliesResponse = await apiService.getAnomalies(buildingId);
+          const anomalyData = anomaliesResponse.anomalies.map(anomaly => ({
+            date: new Date(anomaly.timestamp).toISOString().split('T')[0],
+            building: selectedBuilding,
+            type: anomaly.type,
+            severity: anomaly.severity,
+            description: anomaly.description,
+            confidence: anomaly.confidence,
+            anomalyScore: anomaly.confidence
+          }));
+          
+          setAnomalies(anomalyData);
+          
+          // For now, use mock clustering (can be enhanced later)
+          const clusterLabels = AdvancedMLModels.kMeansClustering(transformedData.slice(-100));
+          setClusters(clusterLabels);
+          
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          // Fallback to mock data if API fails
+          const syntheticData = generateAdvancedSyntheticData();
+          setData(syntheticData);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchData();
     }
-  }, [currentUser, selectedBuilding]);
+  }, [currentUser, selectedBuilding, selectedTimeRange]);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
@@ -343,6 +389,7 @@ const BuildingDashboard = () => {
   };
 
   const handleLogout = () => {
+    apiService.clearToken();
     setCurrentUser(null);
     setData([]);
     setIsLoading(true);
