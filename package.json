@@ -7,7 +7,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "setup": "node setup.js",
+    "start-servers": "node start-servers.js",
+    "start-windows": "start-servers.bat",
+    "start-mac": "./start-servers.sh",
+    "setup-windows": "setup-windows.bat"
   },
   "dependencies": {
     "react": "^18.2.0",
