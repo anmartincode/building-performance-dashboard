@@ -46,6 +46,28 @@ Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
                               AI/ML Models
 ```
 
+## 💻 Cross-Platform Compatibility
+
+This application is designed to work across multiple platforms:
+
+### ✅ Supported Platforms
+- **Windows 10/11** (with Windows Scripts)
+- **macOS** (Intel & Apple Silicon)
+- **Linux** (Ubuntu, Debian, CentOS)
+
+### 🔧 Platform-Specific Features
+- **Windows**: Batch files (`.bat`) and PowerShell scripts (`.ps1`)
+- **macOS/Linux**: Bash scripts (`.sh`)
+- **Universal**: Python and Node.js applications work on all platforms
+
+### 📁 Platform-Specific Files
+- `start-servers.sh` - macOS/Linux startup script
+- `start-servers.bat` - Windows Command Prompt startup script  
+- `start-servers.ps1` - Windows PowerShell startup script
+- `setup-windows.bat` - Windows automated setup
+- `setup_database_windows.py` - Windows database setup
+- `WINDOWS_SETUP.md` - Comprehensive Windows guide
+
 ### Frontend (React)
 - **Location**: `src/`
 - **Port**: 3000
@@ -73,6 +95,10 @@ Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
 
 ### Prerequisites
 
+> **📋 Platform-Specific Setup**
+> - **Windows**: See [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for detailed Windows installation guide
+> - **macOS/Linux**: Follow the instructions below
+
 1. **Install MySQL**
    ```bash
    # macOS
@@ -90,6 +116,20 @@ Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
 
 ### Option 1: Automated Setup (Recommended)
 
+#### Cross-Platform (All OS)
+```bash
+# Clone the repository
+git clone <repository-url>
+cd building-performance-dashboard
+
+# Run cross-platform setup
+npm run setup
+
+# Start both servers
+npm run start-servers
+```
+
+#### macOS/Linux
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -104,28 +144,55 @@ cd ..
 ./start-servers.sh
 ```
 
+#### Windows
+```cmd
+# Clone the repository
+git clone <repository-url>
+cd building-performance-dashboard
+
+# Run automated setup
+setup-windows.bat
+
+# Start both servers
+start-servers.bat
+```
+
 ### Option 2: Manual Setup
 
-#### 1. Setup Database
+#### macOS/Linux
 ```bash
+# 1. Setup Database
 cd backend
 python3 setup_database.py
-```
 
-#### 2. Install Frontend Dependencies
-```bash
+# 2. Install Frontend Dependencies
+cd ..
 npm install
-```
 
-#### 3. Start the Backend
-```bash
+# 3. Start the Backend
 cd backend
 python3 main.py
+
+# 4. Start the Frontend (in new terminal)
+export PATH="/opt/homebrew/bin:$PATH"
+npm start
 ```
 
-#### 4. Start the Frontend
-```bash
-export PATH="/opt/homebrew/bin:$PATH"
+#### Windows
+```cmd
+# 1. Setup Database
+cd backend
+python setup_database_windows.py
+
+# 2. Install Frontend Dependencies
+cd ..
+npm install
+
+# 3. Start the Backend
+cd backend
+python main.py
+
+# 4. Start the Frontend (in new terminal)
 npm start
 ```
 
@@ -148,24 +215,30 @@ npm start
 
 ```
 building-performance-dashboard/
-├── src/                    # React frontend
-│   ├── dashboard.js       # Main dashboard component
-│   ├── api.js            # API service layer
-│   └── index.js          # React entry point
-├── backend/               # Python FastAPI backend
-│   ├── main.py           # FastAPI application
-│   ├── database.py       # Database models and configuration
-│   ├── services.py       # Business logic and database operations
-│   ├── ai_models.py      # ML models and algorithms
-│   ├── setup_database.py # Database setup script
-│   ├── requirements.txt  # Python dependencies
-│   ├── env.example       # Environment configuration template
-│   └── README.md         # Backend documentation
-├── public/               # Static assets
-├── package.json          # Node.js dependencies
-├── start-servers.sh      # Server startup script
-└── README.md            # This file
-```
+├── src/                           # React frontend
+│   ├── dashboard.js              # Main dashboard component
+│   ├── api.js                   # API service layer
+│   └── index.js                 # React entry point
+├── backend/                      # Python FastAPI backend
+│   ├── main.py                  # FastAPI application
+│   ├── database.py              # Database models and configuration
+│   ├── services.py              # Business logic and database operations
+│   ├── ai_models.py             # ML models and algorithms
+│   ├── setup_database.py        # Database setup script (macOS/Linux)
+│   ├── setup_database_windows.py # Database setup script (Windows)
+│   ├── requirements.txt         # Python dependencies
+│   ├── env.example              # Environment configuration template
+│   └── README.md                # Backend documentation
+├── public/                      # Static assets
+├── package.json                 # Node.js dependencies
+├── start-servers.sh             # Server startup script (macOS/Linux)
+├── start-servers.bat            # Server startup script (Windows CMD)
+├── start-servers.ps1            # Server startup script (Windows PowerShell)
+├── start-servers.js             # Cross-platform server launcher
+├── setup.js                     # Cross-platform setup script
+├── setup-windows.bat            # Windows setup script
+├── WINDOWS_SETUP.md             # Windows setup guide
+└── README.md                   # This file
 
 ## 🗄️ Database Schema
 
