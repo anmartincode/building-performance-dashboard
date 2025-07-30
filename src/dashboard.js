@@ -526,14 +526,12 @@ const BuildingDashboard = () => {
                 <span className="text-sm text-gray-700">{currentUser.username}</span>
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{currentUser.role}</span>
               </div>
-              {canManageUsers && (
-                <button 
-                  onClick={() => setShowSettings(true)}
-                  className="p-2 text-gray-500 hover:text-gray-700"
-                >
-                  <Settings className="h-5 w-5" />
-                </button>
-              )}
+              <button 
+                onClick={() => setShowSettings(true)}
+                className="p-2 text-gray-500 hover:text-gray-700"
+              >
+                <Settings className="h-5 w-5" />
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
