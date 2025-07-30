@@ -156,7 +156,7 @@ const generateAdvancedSyntheticData = () => {
         lightingLoad,
         lightingEfficiency: Math.round(lightingEfficiency * 100) / 100,
         daylightSensor: Math.round(daylightSensor),
-        ledLights: Math.round(lightingLoad * 0.8),
+        ledLights: Math.round((occupancy * 0.5 + Math.random() * 20) * 0.8),
         
         // Security Data
         securityAlerts,
@@ -226,72 +226,81 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-800 flex items-center justify-center p-6">
-      <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Building Dashboard</h1>
-          <p className="text-gray-600">AI-Powered Building Management</p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-            <input
-              type="text"
-              value={credentials.username}
-              onChange={(e) => setCredentials({...credentials, username: e.target.value})}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter username"
-              required
-              disabled={isLoading}
-            />
+    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+      <div className="card shadow-lg border-0" style={{maxWidth: '400px', width: '100%'}}>
+        <div className="card-body p-4">
+          <div className="text-center mb-4">
+            <h1 className="h3 fw-bold text-dark mb-2">Building Dashboard</h1>
+            <p className="text-muted">AI-Powered Building Management</p>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <div className="relative">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="mb-3">
+              <label className="form-label fw-medium">Username</label>
               <input
-                type={showPassword ? "text" : "password"}
-                value={credentials.password}
-                onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter password"
+                type="text"
+                value={credentials.username}
+                onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                className="form-control form-control-lg"
+                placeholder="Enter username"
                 required
                 disabled={isLoading}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                disabled={isLoading}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
             </div>
-          </div>
-          
-          {error && (
-            <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">
-              {error}
+            
+            <div className="mb-3">
+              <label className="form-label fw-medium">Password</label>
+              <div className="position-relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                  className="form-control form-control-lg pe-5"
+                  placeholder="Enter password"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3"
+                  disabled={isLoading}
+                >
+                  <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                </button>
+              </div>
             </div>
-          )}
+            
+            {error && (
+              <div className="alert alert-danger text-center">
+                {error}
+              </div>
+            )}
+            
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg w-100 fw-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
           
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
-        
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Demo Accounts:</p>
-          <div className="text-xs space-y-1">
-            <div><strong>Admin:</strong> admin / admin123</div>
-            <div><strong>Manager:</strong> facility_manager / fm123</div>
-            <div><strong>Tech:</strong> technician / tech123</div>
-            <div><strong>Guest:</strong> guest / guest123</div>
+          <div className="mt-4 p-3 bg-light rounded">
+            <p className="text-muted small mb-2">Demo Accounts:</p>
+            <div className="small">
+              <div><strong>Admin:</strong> admin / admin123</div>
+              <div><strong>Manager:</strong> facility_manager / fm123</div>
+              <div><strong>Tech:</strong> technician / tech123</div>
+              <div><strong>Guest:</strong> guest / guest123</div>
+            </div>
           </div>
         </div>
       </div>
@@ -501,209 +510,252 @@ const BuildingDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading advanced building analytics...</p>
+          <div className="spinner-border text-primary mb-3" role="status" style={{width: '3rem', height: '3rem'}}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted">Loading advanced building analytics...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-vh-100 bg-light">
       {/* Header with User Management */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Smart Building Dashboard</h1>
-              <p className="text-gray-600">Advanced AI-Powered Building Management System</p>
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
+        <div className="container-fluid">
+          <div className="navbar-brand">
+            <h1 className="h4 fw-bold text-dark mb-0">Smart Building Dashboard</h1>
+            <p className="text-muted small mb-0">Advanced AI-Powered Building Management System</p>
+          </div>
+          
+          <div className="navbar-nav ms-auto align-items-center">
+            <div className="nav-item d-flex align-items-center me-3">
+              <i className="bi bi-person-circle text-muted me-2"></i>
+              <span className="text-muted me-2">{currentUser.username}</span>
+              <span className="badge bg-primary rounded-pill">{currentUser.role}</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-gray-500" />
-                <span className="text-sm text-gray-700">{currentUser.username}</span>
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{currentUser.role}</span>
-              </div>
+            <div className="nav-item">
               <button 
                 onClick={() => setShowSettings(true)}
-                className="p-2 text-gray-500 hover:text-gray-700"
+                className="btn btn-outline-secondary btn-sm me-2"
+                title="Settings"
               >
-                <Settings className="h-5 w-5" />
+                <i className="bi bi-gear"></i>
               </button>
+            </div>
+            <div className="nav-item">
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                className="btn btn-outline-danger btn-sm"
+                title="Logout"
               >
-                <LogOut className="h-5 w-5" />
-                <span className="text-sm">Logout</span>
+                <i className="bi bi-box-arrow-right me-1"></i>
+                Logout
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="container-fluid py-4">
         {/* Enhanced Controls */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Building</label>
-              <select 
-                value={selectedBuilding} 
-                onChange={(e) => setSelectedBuilding(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {getBuildingDisplayNames(currentUser.buildings).map(building => (
-                  <option key={building} value={building}>{building}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">System View</label>
-              <select 
-                value={selectedSystem} 
-                onChange={(e) => setSelectedSystem(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="energy">Energy Management</option>
-                <option value="hvac">HVAC System</option>
-                <option value="lighting">Lighting Control</option>
-                <option value="security">Security System</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Time Range</label>
-              <select 
-                value={selectedTimeRange} 
-                onChange={(e) => setSelectedTimeRange(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value={7}>Last 7 days</option>
-                <option value={30}>Last 30 days</option>
-                <option value={90}>Last 90 days</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
-                Export Report
-              </button>
+        <div className="card shadow-sm mb-4">
+          <div className="card-body">
+            <div className="row g-3">
+              <div className="col-md-3">
+                <label className="form-label fw-medium">Building</label>
+                <select 
+                  value={selectedBuilding} 
+                  onChange={(e) => setSelectedBuilding(e.target.value)}
+                  className="form-select"
+                >
+                  {getBuildingDisplayNames(currentUser.buildings).map(building => (
+                    <option key={building} value={building}>{building}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-medium">System View</label>
+                <select 
+                  value={selectedSystem} 
+                  onChange={(e) => setSelectedSystem(e.target.value)}
+                  className="form-select"
+                >
+                  <option value="energy">Energy Management</option>
+                  <option value="hvac">HVAC System</option>
+                  <option value="lighting">Lighting Control</option>
+                  <option value="security">Security System</option>
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-medium">Time Range</label>
+                <select 
+                  value={selectedTimeRange} 
+                  onChange={(e) => setSelectedTimeRange(Number(e.target.value))}
+                  className="form-select"
+                >
+                  <option value={7}>Last 7 days</option>
+                  <option value={30}>Last 30 days</option>
+                  <option value={90}>Last 90 days</option>
+                </select>
+              </div>
+              <div className="col-md-3 d-flex align-items-end">
+                <button className="btn btn-primary w-100">
+                  <i className="bi bi-download me-2"></i>
+                  Export Report
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Enhanced Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{currentStats.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{currentStats.primary} {currentStats.unit}</p>
+        <div className="row g-4 mb-4">
+          <div className="col-md-3">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p className="text-muted small mb-1">{currentStats.label}</p>
+                    <h3 className="h4 fw-bold mb-1">{currentStats.primary} {currentStats.unit}</h3>
+                    <p className="text-muted small mb-0">{currentStats.secondaryLabel}: {currentStats.secondary}</p>
+                  </div>
+                  <div className={`p-2 rounded ${selectedSystem === 'energy' ? 'bg-primary' : selectedSystem === 'hvac' ? 'bg-success' : selectedSystem === 'lighting' ? 'bg-warning' : 'bg-danger'}`}>
+                    <i className={`bi ${selectedSystem === 'energy' ? 'bi-lightning' : selectedSystem === 'hvac' ? 'bi-wind' : selectedSystem === 'lighting' ? 'bi-lightbulb' : 'bi-shield'} text-white`}></i>
+                  </div>
+                </div>
               </div>
-              {selectedSystem === 'energy' && <Zap className="h-8 w-8 text-blue-600" />}
-              {selectedSystem === 'hvac' && <Wind className="h-8 w-8 text-green-600" />}
-              {selectedSystem === 'lighting' && <Lightbulb className="h-8 w-8 text-yellow-600" />}
-              {selectedSystem === 'security' && <Shield className="h-8 w-8 text-red-600" />}
             </div>
-            <p className="text-sm text-gray-500 mt-2">{currentStats.secondaryLabel}: {currentStats.secondary}</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">ML Predictions</p>
-                <p className="text-2xl font-bold text-gray-900">{predictions.length}</p>
+          <div className="col-md-3">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p className="text-muted small mb-1">ML Predictions</p>
+                    <h3 className="h4 fw-bold mb-1">{predictions.length}</h3>
+                    <p className="text-muted small mb-0">LSTM Forecasting Active</p>
+                  </div>
+                  <div className="p-2 rounded bg-purple">
+                    <i className="bi bi-graph-up text-white"></i>
+                  </div>
+                </div>
               </div>
-              <Activity className="h-8 w-8 text-purple-600" />
             </div>
-            <p className="text-sm text-gray-500 mt-2">LSTM Forecasting Active</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">System Health</p>
-                <p className="text-2xl font-bold text-gray-900">98.5%</p>
+          <div className="col-md-3">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p className="text-muted small mb-1">System Health</p>
+                    <h3 className="h4 fw-bold mb-1">98.5%</h3>
+                    <p className="text-muted small mb-0">All systems operational</p>
+                  </div>
+                  <div className="p-2 rounded bg-warning">
+                    <i className="bi bi-thermometer-half text-white"></i>
+                  </div>
+                </div>
               </div>
-              <ThermometerSun className="h-8 w-8 text-orange-600" />
             </div>
-            <p className="text-sm text-gray-500 mt-2">All systems operational</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Anomalies</p>
-                <p className="text-2xl font-bold text-gray-900">{anomalies.length}</p>
+          <div className="col-md-3">
+            <div className="card shadow-sm h-100">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p className="text-muted small mb-1">Anomalies</p>
+                    <h3 className="h4 fw-bold mb-1">{anomalies.length}</h3>
+                    <p className="text-muted small mb-0">Random Forest Detection</p>
+                  </div>
+                  <div className="p-2 rounded bg-danger">
+                    <i className="bi bi-exclamation-triangle text-white"></i>
+                  </div>
+                </div>
               </div>
-              <AlertTriangle className="h-8 w-8 text-red-600" />
             </div>
-            <p className="text-sm text-gray-500 mt-2">Random Forest Detection</p>
           </div>
         </div>
 
         {/* Advanced Analytics Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="row g-4 mb-4">
           {/* Main System Chart */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {selectedSystem.charAt(0).toUpperCase() + selectedSystem.slice(1)} Performance Trend
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{fontSize: 12}} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                {selectedSystem === 'energy' && (
-                  <Area type="monotone" dataKey="energyConsumption" stackId="1" stroke="#2563eb" fill="#3b82f6" name="Energy (kWh)" />
-                )}
-                {selectedSystem === 'hvac' && (
-                  <>
-                    <Area type="monotone" dataKey="hvacLoad" stackId="1" stroke="#059669" fill="#10b981" name="HVAC Load" />
-                    <Area type="monotone" dataKey="hvacEfficiency" stackId="2" stroke="#dc2626" fill="#ef4444" name="Efficiency %" />
-                  </>
-                )}
-                {selectedSystem === 'lighting' && (
-                  <>
-                    <Area type="monotone" dataKey="lightingLoad" stackId="1" stroke="#d97706" fill="#f59e0b" name="Lighting Load" />
-                    <Area type="monotone" dataKey="daylightSensor" stackId="2" stroke="#7c3aed" fill="#8b5cf6" name="Daylight %" />
-                  </>
-                )}
-                {selectedSystem === 'security' && (
-                  <>
-                    <Area type="monotone" dataKey="accessEvents" stackId="1" stroke="#dc2626" fill="#ef4444" name="Access Events" />
-                    <Area type="monotone" dataKey="securityAlerts" stackId="2" stroke="#7c3aed" fill="#8b5cf6" name="Alerts" />
-                  </>
-                )}
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="col-lg-8">
+            <div className="card shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title fw-bold">
+                  {selectedSystem.charAt(0).toUpperCase() + selectedSystem.slice(1)} Performance Trend
+                </h5>
+                <div style={{height: '300px'}}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" tick={{fontSize: 12}} />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {selectedSystem === 'energy' && (
+                        <Area type="monotone" dataKey="energyConsumption" stackId="1" stroke="#2563eb" fill="#3b82f6" name="Energy (kWh)" />
+                      )}
+                      {selectedSystem === 'hvac' && (
+                        <>
+                          <Area type="monotone" dataKey="hvacLoad" stackId="1" stroke="#059669" fill="#10b981" name="HVAC Load" />
+                          <Area type="monotone" dataKey="hvacEfficiency" stackId="2" stroke="#dc2626" fill="#ef4444" name="Efficiency %" />
+                        </>
+                      )}
+                      {selectedSystem === 'lighting' && (
+                        <>
+                          <Area type="monotone" dataKey="lightingLoad" stackId="1" stroke="#d97706" fill="#f59e0b" name="Lighting Load" />
+                          <Area type="monotone" dataKey="daylightSensor" stackId="2" stroke="#7c3aed" fill="#8b5cf6" name="Daylight %" />
+                        </>
+                      )}
+                      {selectedSystem === 'security' && (
+                        <>
+                          <Area type="monotone" dataKey="accessEvents" stackId="1" stroke="#dc2626" fill="#ef4444" name="Access Events" />
+                          <Area type="monotone" dataKey="securityAlerts" stackId="2" stroke="#7c3aed" fill="#8b5cf6" name="Alerts" />
+                        </>
+                      )}
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Energy Distribution */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Energy Distribution</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={systemDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {systemDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="col-lg-4">
+            <div className="card shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title fw-bold">Energy Distribution</h5>
+                <div style={{height: '300px'}}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={systemDistribution}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {systemDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1006,227 +1058,242 @@ const BuildingDashboard = () => {
         )}
 
         {/* Footer */}
-        <div className="text-center text-sm text-gray-500 py-4">
-          <p>Advanced Building Management System • LSTM Neural Networks • Random Forest ML • Real-time Analytics</p>
-          <p className="mt-1">User: {currentUser.username} ({currentUser.role}) • Buildings: {currentUser.buildings.join(', ')}</p>
+        <div className="text-center py-4 mt-5">
+          <p className="text-muted small mb-1">Advanced Building Management System • LSTM Neural Networks • Random Forest ML • Real-time Analytics</p>
+          <p className="text-muted small">User: {currentUser.username} ({currentUser.role}) • Buildings: {currentUser.buildings.join(', ')}</p>
         </div>
       </div>
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">System Settings</h2>
-              <button
-                onClick={() => setShowSettings(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* Data Refresh Settings */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Data Refresh Settings</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Auto-refresh Interval (seconds)
-                    </label>
-                    <select
-                      value={settings.refreshInterval}
-                      onChange={(e) => setSettings({...settings, refreshInterval: Number(e.target.value)})}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value={15}>15 seconds</option>
-                      <option value={30}>30 seconds</option>
-                      <option value={60}>1 minute</option>
-                      <option value={300}>5 minutes</option>
-                      <option value={600}>10 minutes</option>
-                    </select>
+        <div className="modal fade show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}} tabIndex="-1">
+          <div className="modal-dialog modal-lg modal-dialog-scrollable">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">System Settings</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowSettings(false)}
+                ></button>
+              </div>
+              
+              <div className="modal-body">
+                <div className="row g-4">
+                  {/* Data Refresh Settings */}
+                  <div className="col-12">
+                    <h6 className="fw-bold mb-3">Data Refresh Settings</h6>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium">
+                          Auto-refresh Interval (seconds)
+                        </label>
+                        <select
+                          value={settings.refreshInterval}
+                          onChange={(e) => setSettings({...settings, refreshInterval: Number(e.target.value)})}
+                          className="form-select"
+                        >
+                          <option value={15}>15 seconds</option>
+                          <option value={30}>30 seconds</option>
+                          <option value={60}>1 minute</option>
+                          <option value={300}>5 minutes</option>
+                          <option value={600}>10 minutes</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Alert Thresholds */}
+                  <div className="col-12">
+                    <h6 className="fw-bold mb-3">Alert Thresholds</h6>
+                    <div className="row g-3">
+                      <div className="col-md-4">
+                        <label className="form-label fw-medium">
+                          Energy Consumption (kWh)
+                        </label>
+                        <input
+                          type="number"
+                          value={settings.alertThresholds.energy}
+                          onChange={(e) => setSettings({
+                            ...settings, 
+                            alertThresholds: {...settings.alertThresholds, energy: Number(e.target.value)}
+                          })}
+                          className="form-control"
+                        />
+                      </div>
+                      <div className="col-md-4">
+                        <label className="form-label fw-medium">
+                          Temperature (°F)
+                        </label>
+                        <input
+                          type="number"
+                          value={settings.alertThresholds.temperature}
+                          onChange={(e) => setSettings({
+                            ...settings, 
+                            alertThresholds: {...settings.alertThresholds, temperature: Number(e.target.value)}
+                          })}
+                          className="form-control"
+                        />
+                      </div>
+                      <div className="col-md-4">
+                        <label className="form-label fw-medium">
+                          Occupancy (%)
+                        </label>
+                        <input
+                          type="number"
+                          value={settings.alertThresholds.occupancy}
+                          onChange={(e) => setSettings({
+                            ...settings, 
+                            alertThresholds: {...settings.alertThresholds, occupancy: Number(e.target.value)}
+                          })}
+                          className="form-control"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notification Settings */}
+                  <div className="col-12">
+                    <h6 className="fw-bold mb-3">Notification Preferences</h6>
+                    <div className="row g-3">
+                      <div className="col-md-4">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            id="email-notifications"
+                            checked={settings.notifications.email}
+                            onChange={(e) => setSettings({
+                              ...settings, 
+                              notifications: {...settings.notifications, email: e.target.checked}
+                            })}
+                            className="form-check-input"
+                          />
+                          <label className="form-check-label" htmlFor="email-notifications">
+                            Email Notifications
+                          </label>
+                        </div>
+                      </div>
+                      <div className="col-md-4">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            id="sms-notifications"
+                            checked={settings.notifications.sms}
+                            onChange={(e) => setSettings({
+                              ...settings, 
+                              notifications: {...settings.notifications, sms: e.target.checked}
+                            })}
+                            className="form-check-input"
+                          />
+                          <label className="form-check-label" htmlFor="sms-notifications">
+                            SMS Notifications
+                          </label>
+                        </div>
+                      </div>
+                      <div className="col-md-4">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            id="push-notifications"
+                            checked={settings.notifications.push}
+                            onChange={(e) => setSettings({
+                              ...settings, 
+                              notifications: {...settings.notifications, push: e.target.checked}
+                            })}
+                            className="form-check-input"
+                          />
+                          <label className="form-check-label" htmlFor="push-notifications">
+                            Push Notifications
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Display Settings */}
+                  <div className="col-12">
+                    <h6 className="fw-bold mb-3">Display Settings</h6>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium">
+                          Theme
+                        </label>
+                        <select
+                          value={settings.theme}
+                          onChange={(e) => setSettings({...settings, theme: e.target.value})}
+                          className="form-select"
+                        >
+                          <option value="light">Light</option>
+                          <option value="dark">Dark</option>
+                          <option value="auto">Auto</option>
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-medium">
+                          Language
+                        </label>
+                        <select
+                          value={settings.language}
+                          onChange={(e) => setSettings({...settings, language: e.target.value})}
+                          className="form-select"
+                        >
+                          <option value="en">English</option>
+                          <option value="es">Spanish</option>
+                          <option value="fr">French</option>
+                          <option value="de">German</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* System Information */}
+                  <div className="col-12">
+                    <h6 className="fw-bold mb-3">System Information</h6>
+                    <div className="card bg-light">
+                      <div className="card-body">
+                        <div className="row g-2">
+                          <div className="col-6">
+                            <small className="text-muted">Dashboard Version:</small>
+                            <div className="fw-medium">1.0.0</div>
+                          </div>
+                          <div className="col-6">
+                            <small className="text-muted">API Version:</small>
+                            <div className="fw-medium">1.0.0</div>
+                          </div>
+                          <div className="col-6">
+                            <small className="text-muted">Last Updated:</small>
+                            <div className="fw-medium">{new Date().toLocaleDateString()}</div>
+                          </div>
+                          <div className="col-6">
+                            <small className="text-muted">Data Source:</small>
+                            <div className="fw-medium">Real-time Sensors</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Alert Thresholds */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Alert Thresholds</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Energy Consumption (kWh)
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.alertThresholds.energy}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        alertThresholds: {...settings.alertThresholds, energy: Number(e.target.value)}
-                      })}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Temperature (°F)
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.alertThresholds.temperature}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        alertThresholds: {...settings.alertThresholds, temperature: Number(e.target.value)}
-                      })}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Occupancy (%)
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.alertThresholds.occupancy}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        alertThresholds: {...settings.alertThresholds, occupancy: Number(e.target.value)}
-                      })}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowSettings(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    // Save settings logic would go here
+                    setShowSettings(false);
+                  }}
+                >
+                  Save Settings
+                </button>
               </div>
-
-              {/* Notification Settings */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="email-notifications"
-                      checked={settings.notifications.email}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        notifications: {...settings.notifications, email: e.target.checked}
-                      })}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="email-notifications" className="ml-2 text-sm text-gray-700">
-                      Email Notifications
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="sms-notifications"
-                      checked={settings.notifications.sms}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        notifications: {...settings.notifications, sms: e.target.checked}
-                      })}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="sms-notifications" className="ml-2 text-sm text-gray-700">
-                      SMS Notifications
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="push-notifications"
-                      checked={settings.notifications.push}
-                      onChange={(e) => setSettings({
-                        ...settings, 
-                        notifications: {...settings.notifications, push: e.target.checked}
-                      })}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="push-notifications" className="ml-2 text-sm text-gray-700">
-                      Push Notifications
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Display Settings */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Display Settings</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Theme
-                    </label>
-                    <select
-                      value={settings.theme}
-                      onChange={(e) => setSettings({...settings, theme: e.target.value})}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                      <option value="auto">Auto</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Language
-                    </label>
-                    <select
-                      value={settings.language}
-                      onChange={(e) => setSettings({...settings, language: e.target.value})}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="en">English</option>
-                      <option value="es">Spanish</option>
-                      <option value="fr">French</option>
-                      <option value="de">German</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* System Information */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">System Information</h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Dashboard Version:</span>
-                    <span className="text-sm font-medium">1.0.0</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">API Version:</span>
-                    <span className="text-sm font-medium">1.0.0</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Last Updated:</span>
-                    <span className="text-sm font-medium">{new Date().toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Data Source:</span>
-                    <span className="text-sm font-medium">Real-time Sensors</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end space-x-3 p-6 border-t">
-              <button
-                onClick={() => setShowSettings(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // Save settings logic would go here
-                  setShowSettings(false);
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
-              >
-                Save Settings
-              </button>
             </div>
           </div>
         </div>
