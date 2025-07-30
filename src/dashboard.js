@@ -355,7 +355,15 @@ const BuildingDashboard = () => {
             hvacEfficiency: Math.max(60, 100 - (item.temperature - 22) * 5),
             hvacLoad: item.energy_consumption * 0.4,
             lightingEfficiency: item.lighting_status === 'dimmed' ? 85 : (item.lighting_status === 'on' ? 70 : 95),
-            securityStatus: item.occupancy > 0 ? 'active' : 'standby'
+            securityStatus: item.occupancy > 0 ? 'active' : 'standby',
+            // Add missing lighting data properties
+            lightingLoad: Math.round(item.occupancy * 0.5 + Math.random() * 20),
+            daylightSensor: Math.random() * 100,
+            ledLights: Math.round((item.occupancy * 0.5 + Math.random() * 20) * 0.8),
+            // Add missing security data properties
+            accessEvents: Math.round(item.occupancy * 0.1 + Math.random() * 5),
+            securityAlerts: Math.random() < 0.02 ? Math.floor(Math.random() * 3) + 1 : 0,
+            camerasActive: Math.round(8 + Math.random() * 4)
           }));
           
           setData(transformedData);
