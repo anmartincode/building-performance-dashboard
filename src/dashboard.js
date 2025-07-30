@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
-import { AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, ThermometerSun, Shield, Lightbulb, Wind, User, LogOut, Settings, Users, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, ThermometerSun, Shield, Lightbulb, Wind, User, LogOut, Settings, Users, Eye, EyeOff, X } from 'lucide-react';
 import apiService from './api';
 
 // Advanced ML Models Implementation
@@ -309,6 +309,22 @@ const BuildingDashboard = () => {
   const [anomalies, setAnomalies] = useState([]);
   const [clusters, setClusters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState({
+    refreshInterval: 30,
+    alertThresholds: {
+      energy: 150,
+      temperature: 80,
+      occupancy: 90
+    },
+    notifications: {
+      email: true,
+      sms: false,
+      push: true
+    },
+    theme: 'light',
+    language: 'en'
+  });
 
   // Building mapping for API to display names
   const buildingMapping = {
@@ -511,7 +527,10 @@ const BuildingDashboard = () => {
                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{currentUser.role}</span>
               </div>
               {canManageUsers && (
-                <button className="p-2 text-gray-500 hover:text-gray-700">
+                <button 
+                  onClick={() => setShowSettings(true)}
+                  className="p-2 text-gray-500 hover:text-gray-700"
+                >
                   <Settings className="h-5 w-5" />
                 </button>
               )}
@@ -994,6 +1013,226 @@ const BuildingDashboard = () => {
           <p className="mt-1">User: {currentUser.username} ({currentUser.role}) • Buildings: {currentUser.buildings.join(', ')}</p>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">System Settings</h2>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* Data Refresh Settings */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Data Refresh Settings</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Auto-refresh Interval (seconds)
+                    </label>
+                    <select
+                      value={settings.refreshInterval}
+                      onChange={(e) => setSettings({...settings, refreshInterval: Number(e.target.value)})}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value={15}>15 seconds</option>
+                      <option value={30}>30 seconds</option>
+                      <option value={60}>1 minute</option>
+                      <option value={300}>5 minutes</option>
+                      <option value={600}>10 minutes</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alert Thresholds */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Alert Thresholds</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Energy Consumption (kWh)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.alertThresholds.energy}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        alertThresholds: {...settings.alertThresholds, energy: Number(e.target.value)}
+                      })}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Temperature (°F)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.alertThresholds.temperature}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        alertThresholds: {...settings.alertThresholds, temperature: Number(e.target.value)}
+                      })}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Occupancy (%)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.alertThresholds.occupancy}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        alertThresholds: {...settings.alertThresholds, occupancy: Number(e.target.value)}
+                      })}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Settings */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="email-notifications"
+                      checked={settings.notifications.email}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        notifications: {...settings.notifications, email: e.target.checked}
+                      })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="email-notifications" className="ml-2 text-sm text-gray-700">
+                      Email Notifications
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="sms-notifications"
+                      checked={settings.notifications.sms}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        notifications: {...settings.notifications, sms: e.target.checked}
+                      })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="sms-notifications" className="ml-2 text-sm text-gray-700">
+                      SMS Notifications
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="push-notifications"
+                      checked={settings.notifications.push}
+                      onChange={(e) => setSettings({
+                        ...settings, 
+                        notifications: {...settings.notifications, push: e.target.checked}
+                      })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="push-notifications" className="ml-2 text-sm text-gray-700">
+                      Push Notifications
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Display Settings */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Display Settings</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Theme
+                    </label>
+                    <select
+                      value={settings.theme}
+                      onChange={(e) => setSettings({...settings, theme: e.target.value})}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                      <option value="auto">Auto</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Language
+                    </label>
+                    <select
+                      value={settings.language}
+                      onChange={(e) => setSettings({...settings, language: e.target.value})}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* System Information */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">System Information</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Dashboard Version:</span>
+                    <span className="text-sm font-medium">1.0.0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">API Version:</span>
+                    <span className="text-sm font-medium">1.0.0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Last Updated:</span>
+                    <span className="text-sm font-medium">{new Date().toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Data Source:</span>
+                    <span className="text-sm font-medium">Real-time Sensors</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end space-x-3 p-6 border-t">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Save settings logic would go here
+                  setShowSettings(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+              >
+                Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
