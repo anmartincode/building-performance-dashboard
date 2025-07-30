@@ -1,25 +1,28 @@
 # 🏢 Building Performance Dashboard
 
-An AI-powered building management system with real-time monitoring, predictive analytics, and intelligent automation.
+An AI-powered building management system with real-time monitoring, predictive analytics, intelligent automation, and **MySQL database integration**.
 
 ## 🚀 Features
 
 ### 🔐 Multi-User Authentication
 - Role-based access control (Admin, Manager, Technician, Viewer)
-- Secure JWT-based authentication
+- Secure JWT-based authentication with bcrypt password hashing
 - Permission-based feature access
+- Persistent user management
 
 ### 📊 Real-Time Monitoring
 - Live sensor data from multiple buildings
 - HVAC, Lighting, and Security system monitoring
 - Energy consumption tracking
 - Occupancy analytics
+- **Persistent data storage in MySQL**
 
 ### 🤖 AI/ML Capabilities
 - **LSTM Neural Networks** for energy consumption prediction
 - **Random Forest** anomaly detection
 - **K-means clustering** for usage pattern analysis
 - Real-time predictive analytics
+- **ML model persistence and caching**
 
 ### 🎨 Modern UI/UX
 - Responsive design with Tailwind CSS
@@ -27,10 +30,20 @@ An AI-powered building management system with real-time monitoring, predictive a
 - Real-time data updates
 - Mobile-friendly interface
 
+### 🗄️ Database Features
+- **MySQL database integration**
+- Persistent data storage
+- User management and authentication
+- Building and sensor data management
+- Anomaly and prediction history
+- Role-based access control
+
 ## 🏗️ Architecture
 
 ```
-Frontend (React) ←→ Backend (Python FastAPI) ←→ AI/ML Models
+Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
+                                    ↓
+                              AI/ML Models
 ```
 
 ### Frontend (React)
@@ -46,38 +59,71 @@ Frontend (React) ←→ Backend (Python FastAPI) ←→ AI/ML Models
 - **Port**: 8000
 - **Framework**: FastAPI
 - **ML Libraries**: scikit-learn, pandas, numpy
-- **Authentication**: JWT tokens
+- **Authentication**: JWT tokens with bcrypt
+- **Database**: MySQL with SQLAlchemy ORM
 - **Documentation**: Auto-generated Swagger UI
+
+### Database (MySQL)
+- **Type**: MySQL 8.0+
+- **ORM**: SQLAlchemy
+- **Features**: User management, sensor data, predictions, anomalies
+- **Security**: Password hashing, role-based access
 
 ## 🚀 Quick Start
 
-### Option 1: Use the Startup Script (Recommended)
+### Prerequisites
+
+1. **Install MySQL**
+   ```bash
+   # macOS
+   brew install mysql
+   brew services start mysql
+   
+   # Ubuntu/Debian
+   sudo apt-get install mysql-server
+   sudo systemctl start mysql
+   
+   # Windows: Download from https://dev.mysql.com/downloads/
+   ```
+
+2. **Install Node.js and npm** (if not already installed)
+
+### Option 1: Automated Setup (Recommended)
+
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd building-performance-dashboard
+
+# Setup database and backend
+cd backend
+python3 setup_database.py
+
+# Start both servers
+cd ..
 ./start-servers.sh
 ```
 
 ### Option 2: Manual Setup
 
-#### 1. Install Dependencies
+#### 1. Setup Database
+```bash
+cd backend
+python3 setup_database.py
+```
 
-**Frontend:**
+#### 2. Install Frontend Dependencies
 ```bash
 npm install
 ```
 
-**Backend:**
-```bash
-cd backend
-pip3 install fastapi uvicorn numpy pandas scikit-learn
-```
-
-#### 2. Start the Backend
+#### 3. Start the Backend
 ```bash
 cd backend
 python3 main.py
 ```
 
-#### 3. Start the Frontend
+#### 4. Start the Frontend
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"
 npm start
@@ -108,8 +154,12 @@ building-performance-dashboard/
 │   └── index.js          # React entry point
 ├── backend/               # Python FastAPI backend
 │   ├── main.py           # FastAPI application
+│   ├── database.py       # Database models and configuration
+│   ├── services.py       # Business logic and database operations
 │   ├── ai_models.py      # ML models and algorithms
+│   ├── setup_database.py # Database setup script
 │   ├── requirements.txt  # Python dependencies
+│   ├── env.example       # Environment configuration template
 │   └── README.md         # Backend documentation
 ├── public/               # Static assets
 ├── package.json          # Node.js dependencies
@@ -117,39 +167,57 @@ building-performance-dashboard/
 └── README.md            # This file
 ```
 
+## 🗄️ Database Schema
+
+### Core Tables
+- **Users**: User accounts and authentication
+- **Buildings**: Building information and metadata
+- **UserBuilding**: Many-to-many user-building relationships
+- **SensorData**: Real-time sensor readings
+- **Anomalies**: Detected anomalies and alerts
+- **Predictions**: ML model predictions
+- **SystemEvents**: System events and maintenance
+
 ## 🔧 API Endpoints
 
 ### Authentication
-- `POST /api/auth/login` - User authentication
+- `POST /api/auth/login` - User authentication with JWT
 
 ### Building Management
-- `GET /api/buildings` - List all buildings
+- `GET /api/buildings` - Get user's accessible buildings
 - `GET /api/buildings/{id}/data` - Get building sensor data
+- `POST /api/buildings/{id}/sensor-data` - Create new sensor data
 
 ### AI/ML Features
 - `POST /api/predictions` - Get LSTM predictions
 - `GET /api/anomalies/{id}` - Get anomaly detection results
+- `POST /api/anomalies/{id}` - Create new anomaly
+
+### User Management
+- `GET /api/users/me` - Get current user info
+- `GET /api/users/me/buildings` - Get user's buildings
 
 ### System
-- `GET /api/health` - Health check
+- `GET /api/health` - Health check with database status
+- `POST /api/init-db` - Initialize database tables
 
 ## 🤖 AI/ML Features
 
 ### 1. LSTM Neural Networks
 - **Purpose**: Energy consumption forecasting
-- **Input**: Historical sensor data
+- **Input**: Historical sensor data from MySQL
 - **Output**: 24-hour predictions with confidence scores
 - **Features**: Business hours, weekly patterns, seasonal trends
 
 ### 2. Random Forest Anomaly Detection
 - **Purpose**: Real-time anomaly detection
-- **Input**: Multi-sensor data streams
+- **Input**: Multi-sensor data streams from database
 - **Output**: Anomaly scores and classifications
 - **Features**: Temperature spikes, energy anomalies, occupancy patterns
 
 ### 3. K-means Clustering
 - **Purpose**: Usage pattern analysis
-- **Input**: Building behavior data
+- **Input**: Building behavior data from MySQL
 - **Output**: Pattern classifications
 - **Features**: High/low activity detection, optimization recommendations
 
@@ -157,10 +225,11 @@ building-performance-dashboard/
 
 ### Adding New Features
 
-1. **Backend API**: Add endpoints in `backend/main.py`
-2. **AI Models**: Implement in `backend/ai_models.py`
-3. **Frontend**: Update components in `src/dashboard.js`
-4. **API Integration**: Use `src/api.js` for communication
+1. **Database Models**: Add to `backend/database.py`
+2. **Business Logic**: Add to `backend/services.py`
+3. **API Endpoints**: Add to `backend/main.py`
+4. **Frontend**: Update components in `src/dashboard.js`
+5. **API Integration**: Use `src/api.js` for communication
 
 ### Environment Variables
 
@@ -168,9 +237,24 @@ Create `.env` files for configuration:
 
 **Backend (.env):**
 ```env
-SECRET_KEY=your-secret-key
-MODEL_PATH=./models
+# Database Configuration
+DATABASE_URL=mysql+pymysql://username:password@localhost:3306/building_dashboard
+
+# Security
+SECRET_KEY=your-super-secret-key-change-this-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Application Settings
 DEBUG=True
+MODEL_PATH=./models
+
+# MySQL Connection Settings
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=your-mysql-password
+MYSQL_DATABASE=building_dashboard
 ```
 
 ### Testing the API
@@ -185,11 +269,22 @@ curl -X POST http://localhost:8000/api/auth/login \
   -d '{"username":"admin","password":"admin123"}'
 
 # Get building data (with auth token)
-curl -H "Authorization: Bearer admin" \
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   http://localhost:8000/api/buildings/building_a/data
 ```
 
 ## 🚀 Production Deployment
+
+### Database Setup
+```bash
+# Create production database
+mysql -u root -p -e "CREATE DATABASE building_dashboard_prod;"
+
+# Create production user
+mysql -u root -p -e "CREATE USER 'dashboard_user'@'localhost' IDENTIFIED BY 'secure_password';"
+mysql -u root -p -e "GRANT ALL PRIVILEGES ON building_dashboard_prod.* TO 'dashboard_user'@'localhost';"
+mysql -u root -p -e "FLUSH PRIVILEGES;"
+```
 
 ### Frontend
 ```bash
@@ -199,30 +294,66 @@ npm run build
 
 ### Backend
 ```bash
-pip install gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
+pip3 install gunicorn
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+```
+
+### Environment Configuration
+```env
+DATABASE_URL=mysql+pymysql://dashboard_user:secure_password@localhost:3306/building_dashboard_prod
+SECRET_KEY=your-production-secret-key
+DEBUG=False
 ```
 
 ## 📊 Data Flow
 
-1. **Sensors** → **Backend API** → **AI Models** → **Frontend Dashboard**
-2. **User Actions** → **Frontend** → **Backend API** → **Database/ML Models**
-3. **Real-time Updates** → **WebSocket/SSE** → **Frontend Charts**
+1. **Sensors** → **API Endpoints** → **MySQL Database** → **AI Models** → **Frontend Dashboard**
+2. **User Actions** → **Frontend** → **Backend API** → **MySQL Database** → **ML Processing**
+3. **Real-time Updates** → **Database Triggers** → **WebSocket/SSE** → **Frontend Charts**
 
 ## 🔒 Security Features
 
-- JWT token authentication
+- JWT token authentication with expiration
+- Password hashing with bcrypt
 - Role-based access control
+- SQL injection protection with SQLAlchemy
 - CORS protection
 - Input validation with Pydantic
-- Secure password handling
+- Secure environment variable handling
 
 ## 📈 Performance
 
 - **Frontend**: React 18 with optimized rendering
 - **Backend**: FastAPI with async/await
-- **ML Models**: Optimized scikit-learn implementations
+- **Database**: Optimized MySQL queries with indexes
+- **ML Models**: Cached predictions and efficient algorithms
 - **Real-time**: Efficient data streaming
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **MySQL Connection Failed**
+   - Check MySQL service is running
+   - Verify credentials in `.env` file
+   - Ensure database exists
+
+2. **Database Setup Issues**
+   - Run: `cd backend && python3 setup_database.py`
+   - Check MySQL permissions
+   - Verify database exists
+
+3. **Import Errors**
+   - Install dependencies: `pip3 install -r requirements.txt`
+   - Check Python path and virtual environment
+
+4. **Authentication Issues**
+   - Check JWT token expiration
+   - Verify user exists in database
+   - Check password hashing
+
+### Debug Mode
+Set `DEBUG=True` in `.env` for detailed error messages and SQL query logging.
 
 ## 🤝 Contributing
 
@@ -238,4 +369,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Built with ❤️ using React, FastAPI, and AI/ML technologies**
+**Built with ❤️ using React, FastAPI, MySQL, and AI/ML technologies**
