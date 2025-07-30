@@ -173,10 +173,10 @@ const generateAdvancedSyntheticData = () => {
 // User Management System
 const UserManager = {
   users: [
-    { id: 1, username: 'admin', password: 'admin123', role: 'Administrator', buildings: ['Building A', 'Building B', 'Building C', 'Building D'] },
-    { id: 2, username: 'facility_manager', password: 'fm123', role: 'Facility Manager', buildings: ['Building A', 'Building B'] },
-    { id: 3, username: 'technician', password: 'tech123', role: 'Technician', buildings: ['Building A'] },
-    { id: 4, username: 'guest', password: 'guest123', role: 'Viewer', buildings: ['Building A'] }
+    { id: 1, username: 'admin', password: 'admin123', role: 'Administrator', buildings: ['building_a', 'building_b', 'building_c', 'building_d'] },
+    { id: 2, username: 'facility_manager', password: 'fm123', role: 'Facility Manager', buildings: ['building_a', 'building_b'] },
+    { id: 3, username: 'technician', password: 'tech123', role: 'Technician', buildings: ['building_a'] },
+    { id: 4, username: 'guest', password: 'guest123', role: 'Viewer', buildings: ['building_a'] }
   ],
   
   authenticate: (username, password) => {
@@ -212,7 +212,7 @@ const LoginForm = ({ onLogin }) => {
       const user = {
         username: response.user.username,
         role: response.user.role,
-        buildings: ['building_a', 'building_b', 'building_c'], // All users can see all buildings
+        buildings: ['building_a', 'building_b', 'building_c', 'building_d'], // All users can see all buildings
         permissions: UserManager.getPermissions(response.user.role)
       };
       
@@ -310,13 +310,33 @@ const BuildingDashboard = () => {
   const [clusters, setClusters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Building mapping for API to display names
+  const buildingMapping = {
+    'building_a': 'Building A',
+    'building_b': 'Building B', 
+    'building_c': 'Building C',
+    'building_d': 'Building D'
+  };
+
+  // Get display names for buildings
+  const getBuildingDisplayNames = (buildingIds) => {
+    return buildingIds.map(id => buildingMapping[id] || id);
+  };
+
+  // Get API building ID from display name
+  const getBuildingApiId = (displayName) => {
+    const entries = Object.entries(buildingMapping);
+    const entry = entries.find(([apiId, display]) => display === displayName);
+    return entry ? entry[0] : displayName.toLowerCase().replace(' ', '_');
+  };
+
   useEffect(() => {
     if (currentUser) {
       const fetchData = async () => {
         setIsLoading(true);
         try {
           // Fetch building data from API
-          const buildingId = selectedBuilding.toLowerCase().replace(' ', '_');
+          const buildingId = getBuildingApiId(selectedBuilding);
           const response = await apiService.getBuildingData(buildingId, selectedTimeRange);
           
           // Transform API data to match frontend format
@@ -385,7 +405,9 @@ const BuildingDashboard = () => {
 
   const handleLogin = (user) => {
     setCurrentUser(user);
-    setSelectedBuilding(user.buildings[0]);
+    // Set the first building as default, using display name
+    const firstBuildingDisplayName = getBuildingDisplayNames(user.buildings)[0];
+    setSelectedBuilding(firstBuildingDisplayName);
   };
 
   const handleLogout = () => {
@@ -509,7 +531,7 @@ const BuildingDashboard = () => {
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={!canEdit}
               >
-                {currentUser.buildings.map(building => (
+                {getBuildingDisplayNames(currentUser.buildings).map(building => (
                   <option key={building} value={building}>{building}</option>
                 ))}
               </select>
