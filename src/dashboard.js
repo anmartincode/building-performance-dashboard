@@ -1,7 +1,408 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
-import { AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, ThermometerSun, Shield, Lightbulb, Wind, User, Settings, Users, Eye, EyeOff, X } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, ThermometerSun, Shield, Lightbulb, Wind, User, Settings, Users, Eye, EyeOff, X, Building, MapPin, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import apiService from './api';
+
+// Building Layout Component
+const BuildingLayout = ({ buildings, anomalies, onBuildingClick, selectedBuilding }) => {
+  const [hoveredBuilding, setHoveredBuilding] = useState(null);
+  const buildingConfigs = {
+    'Building A': {
+      position: { x: 50, y: 50 },
+      size: { width: 140, height: 100 },
+      floors: 3,
+      color: '#3b82f6',
+      name: 'Building A'
+    },
+    'Building B': {
+      position: { x: 250, y: 50 },
+      size: { width: 140, height: 100 },
+      floors: 2,
+      color: '#10b981',
+      name: 'Building B'
+    },
+    'Building C': {
+      position: { x: 50, y: 200 },
+      size: { width: 140, height: 100 },
+      floors: 4,
+      color: '#f59e0b',
+      name: 'Building C'
+    },
+    'Building D': {
+      position: { x: 250, y: 200 },
+      size: { width: 140, height: 100 },
+      floors: 2,
+      color: '#8b5cf6',
+      name: 'Building D'
+    }
+  };
+
+  const getAnomaliesForBuilding = (buildingName) => {
+    return anomalies.filter(anomaly => anomaly.building === buildingName);
+  };
+
+  const getAnomalyColor = (severity) => {
+    switch (severity) {
+      case 'high': return '#ef4444';
+      case 'medium': return '#f59e0b';
+      case 'low': return '#10b981';
+      default: return '#6b7280';
+    }
+  };
+
+  return (
+    <div className="relative bg-gray-50 rounded-lg p-6" style={{ width: '100%', height: '450px' }}>
+      <div className="absolute top-4 left-4">
+        <h4 className="text-lg font-semibold text-gray-900 mb-2">Building Layout</h4>
+        <p className="text-sm text-gray-600">Click on buildings to view anomaly details</p>
+      </div>
+      
+      {/* Legend */}
+      <div className="absolute top-4 right-4 bg-white rounded-lg p-3 shadow-sm">
+        <h5 className="text-sm font-medium text-gray-900 mb-2">Anomaly Severity</h5>
+        <div className="space-y-1">
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+            <span className="text-xs text-gray-600">High</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+            <span className="text-xs text-gray-600">Medium</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+            <span className="text-xs text-gray-600">Low</span>
+          </div>
+        </div>
+      </div>
+
+            {/* Grid Container for Buildings */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="grid grid-cols-2 gap-12" style={{ marginTop: '60px' }}>
+          {Object.entries(buildingConfigs).map(([buildingName, config]) => {
+            const buildingAnomalies = getAnomaliesForBuilding(buildingName);
+            const hasAnomalies = buildingAnomalies.length > 0;
+            const isSelected = selectedBuilding === buildingName;
+            
+            return (
+              <div
+                key={buildingName}
+                className={`relative cursor-pointer transition-all duration-200 ${
+                  isSelected ? 'ring-4 ring-blue-500 ring-opacity-50' : ''
+                }`}
+                style={{
+                  width: `${config.size.width}px`,
+                  height: `${config.size.height}px`
+                }}
+                onClick={() => onBuildingClick(buildingName)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  setHoveredBuilding(buildingName);
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  setHoveredBuilding(null);
+                }}
+              >
+            {/* Building Structure */}
+            <div
+              className="relative rounded-lg shadow-md border-2"
+              style={{
+                backgroundColor: config.color,
+                borderColor: hasAnomalies ? '#ef4444' : '#e5e7eb',
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              {/* Building Name */}
+              <div className="absolute -top-6 left-0 right-0 text-center">
+                <span className="text-xs font-medium text-gray-700 bg-white px-2 py-1 rounded">
+                  {config.name}
+                </span>
+              </div>
+
+              {/* Floor Indicators */}
+              <div className="absolute bottom-1 left-1 right-1">
+                <div className="flex justify-center space-x-1">
+                  {Array.from({ length: config.floors }, (_, i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 bg-white bg-opacity-80 rounded"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Anomaly Indicators */}
+              {hasAnomalies && (
+                <div className="absolute -top-2 -right-2">
+                  <div className="bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                    {buildingAnomalies.length}
+                  </div>
+                </div>
+              )}
+
+              {/* Anomaly Dots on Building */}
+              {buildingAnomalies.map((anomaly, index) => (
+                <div
+                  key={index}
+                  className="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                  style={{
+                    backgroundColor: getAnomalyColor(anomaly.severity),
+                    left: `${20 + (index * 15) % 80}%`,
+                    top: `${30 + (index * 10) % 60}%`,
+                    zIndex: 10
+                  }}
+                  title={`${anomaly.type} - ${anomaly.severity} severity`}
+                ></div>
+              ))}
+            </div>
+
+            {/* Hover Tooltip */}
+            <div className={`absolute -bottom-20 left-0 bg-white rounded-lg shadow-lg p-3 border transition-opacity duration-200 pointer-events-none z-20 min-w-48 ${
+              hoveredBuilding === buildingName ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <h6 className="font-medium text-gray-900 mb-1">{config.name}</h6>
+              <p className="text-xs text-gray-600 mb-2">{config.floors} floors</p>
+              {hasAnomalies ? (
+                <div>
+                  <p className="text-xs text-red-600 font-medium mb-1">
+                    {buildingAnomalies.length} anomaly{buildingAnomalies.length > 1 ? 'ies' : 'y'} detected
+                  </p>
+                  <div className="space-y-1">
+                    {buildingAnomalies.slice(0, 3).map((anomaly, idx) => (
+                      <div key={idx} className="text-xs text-gray-600">
+                        • {anomaly.type.replace('_', ' ')} ({anomaly.severity})
+                      </div>
+                    ))}
+                    {buildingAnomalies.length > 3 && (
+                      <div className="text-xs text-gray-500">
+                        +{buildingAnomalies.length - 3} more...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-green-600 font-medium">No anomalies detected</p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+        </div>
+      </div>
+
+      {/* Ground/Pathways */}
+      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gray-200 rounded-b-lg"></div>
+      
+      {/* Connection Lines */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280" />
+          </marker>
+        </defs>
+        {/* Add connection lines between buildings if needed */}
+      </svg>
+    </div>
+  );
+};
+
+// Comprehensive Dashboard Export Function
+const exportDashboardToExcel = (data, anomalies, predictions, buildings, selectedTimeRange) => {
+  const wb = XLSX.utils.book_new();
+  
+  // 1. Dashboard Summary Sheet
+  const dashboardSummary = buildings.map(building => {
+    const buildingData = data.filter(d => d.building === building).slice(-selectedTimeRange);
+    const buildingAnomalies = anomalies.filter(a => a.building === building);
+    
+    // Calculate metrics
+    const avgDailyConsumption = buildingData.length > 0 
+      ? Math.round(buildingData.reduce((sum, d) => sum + d.energyConsumption, 0) / buildingData.length)
+      : 0;
+    
+    const totalCost = buildingData.reduce((sum, d) => sum + (d.energyConsumption * 0.12), 0);
+    const systemHealth = buildingData.length > 0 
+      ? Math.round((buildingData.filter(d => d.hvacEfficiency > 80 && d.lightingEfficiency > 85).length / buildingData.length) * 100)
+      : 100;
+    
+    const anomalyCount = buildingAnomalies.length;
+    const predictionCount = predictions.filter(p => p.building === building).length;
+    
+    return {
+      'Building': building,
+      'Avg Daily Consumption (kWh)': avgDailyConsumption,
+      'Total Cost ($)': Math.round(totalCost * 100) / 100,
+      'System Health (%)': systemHealth,
+      'Anomalies Detected': anomalyCount,
+      'ML Predictions': predictionCount,
+      'Data Points Analyzed': buildingData.length
+    };
+  });
+  
+  const summaryWs = XLSX.utils.json_to_sheet(dashboardSummary);
+  summaryWs['!cols'] = [
+    { wch: 15 }, // Building
+    { wch: 20 }, // Avg Daily Consumption
+    { wch: 15 }, // Total Cost
+    { wch: 15 }, // System Health
+    { wch: 18 }, // Anomalies
+    { wch: 15 }, // ML Predictions
+    { wch: 20 }  // Data Points
+  ];
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Dashboard Summary');
+
+  // 2. Energy Consumption Details Sheet
+  const energyData = data.slice(-selectedTimeRange).map(d => ({
+    'Building': d.building,
+    'Date': new Date(d.date).toLocaleDateString(),
+    'Hour': d.hour,
+    'Energy Consumption (kWh)': d.energyConsumption,
+    'Temperature (°F)': d.temperature,
+    'Occupancy (%)': d.occupancy,
+    'Cost ($)': Math.round(d.energyConsumption * 0.12 * 100) / 100,
+    'HVAC Load': d.hvacLoad,
+    'HVAC Efficiency (%)': d.hvacEfficiency,
+    'Lighting Load': d.lightingLoad,
+    'Lighting Efficiency (%)': d.lightingEfficiency,
+    'Daylight Sensor (%)': d.daylightSensor
+  }));
+  
+  const energyWs = XLSX.utils.json_to_sheet(energyData);
+  energyWs['!cols'] = [
+    { wch: 15 }, // Building
+    { wch: 12 }, // Date
+    { wch: 8 },  // Hour
+    { wch: 18 }, // Energy Consumption
+    { wch: 15 }, // Temperature
+    { wch: 12 }, // Occupancy
+    { wch: 10 }, // Cost
+    { wch: 12 }, // HVAC Load
+    { wch: 15 }, // HVAC Efficiency
+    { wch: 12 }, // Lighting Load
+    { wch: 18 }, // Lighting Efficiency
+    { wch: 15 }  // Daylight Sensor
+  ];
+  XLSX.utils.book_append_sheet(wb, energyWs, 'Energy Consumption');
+
+  // 3. ML Predictions Sheet
+  const predictionsData = predictions.map(p => ({
+    'Building': p.building,
+    'Date': new Date(p.date).toLocaleDateString(),
+    'Predicted Consumption (kWh)': p.predictedConsumption,
+    'Confidence (%)': Math.round(p.confidence * 100),
+    'Prediction Type': 'LSTM Forecast'
+  }));
+  
+  const predictionsWs = XLSX.utils.json_to_sheet(predictionsData);
+  predictionsWs['!cols'] = [
+    { wch: 15 }, // Building
+    { wch: 12 }, // Date
+    { wch: 22 }, // Predicted Consumption
+    { wch: 15 }, // Confidence
+    { wch: 18 }  // Prediction Type
+  ];
+  XLSX.utils.book_append_sheet(wb, predictionsWs, 'ML Predictions');
+
+  // 4. Anomalies Sheet
+  const anomaliesData = anomalies.map(anomaly => ({
+    'Building': anomaly.building,
+    'Date': new Date(anomaly.date).toLocaleDateString(),
+    'Time': new Date(anomaly.date).toLocaleTimeString(),
+    'Anomaly Type': anomaly.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    'Severity': anomaly.severity.toUpperCase(),
+    'Energy Consumption (kWh)': anomaly.energy,
+    'Temperature (°F)': anomaly.temperature,
+    'Occupancy (%)': anomaly.occupancy,
+    'ML Confidence (%)': Math.round(anomaly.confidence * 100),
+    'Anomaly Score': Math.round(anomaly.anomalyScore * 100) / 100,
+    'Cost Impact ($)': Math.round(anomaly.energy * 0.12 * 100) / 100,
+    'Description': anomaly.description
+  }));
+  
+  const anomaliesWs = XLSX.utils.json_to_sheet(anomaliesData);
+  anomaliesWs['!cols'] = [
+    { wch: 15 }, // Building
+    { wch: 12 }, // Date
+    { wch: 12 }, // Time
+    { wch: 20 }, // Anomaly Type
+    { wch: 10 }, // Severity
+    { wch: 18 }, // Energy Consumption
+    { wch: 15 }, // Temperature
+    { wch: 12 }, // Occupancy
+    { wch: 15 }, // ML Confidence
+    { wch: 12 }, // Anomaly Score
+    { wch: 12 }, // Cost Impact
+    { wch: 30 }  // Description
+  ];
+  XLSX.utils.book_append_sheet(wb, anomaliesWs, 'Anomalies');
+
+  // 5. System Performance Sheet
+  const systemData = data.slice(-selectedTimeRange).map(d => ({
+    'Building': d.building,
+    'Date': new Date(d.date).toLocaleDateString(),
+    'Hour': d.hour,
+    'HVAC Status': d.hvacStatus,
+    'HVAC Efficiency (%)': d.hvacEfficiency,
+    'Air Quality': d.airQuality,
+    'Lighting Efficiency (%)': d.lightingEfficiency,
+    'LED Lights Active': d.ledLights,
+    'Security Alerts': d.securityAlerts,
+    'Access Events': d.accessEvents,
+    'Cameras Active': d.camerasActive,
+    'Security Status': d.securityStatus
+  }));
+  
+  const systemWs = XLSX.utils.json_to_sheet(systemData);
+  systemWs['!cols'] = [
+    { wch: 15 }, // Building
+    { wch: 12 }, // Date
+    { wch: 8 },  // Hour
+    { wch: 12 }, // HVAC Status
+    { wch: 15 }, // HVAC Efficiency
+    { wch: 12 }, // Air Quality
+    { wch: 18 }, // Lighting Efficiency
+    { wch: 15 }, // LED Lights
+    { wch: 15 }, // Security Alerts
+    { wch: 12 }, // Access Events
+    { wch: 15 }, // Cameras Active
+    { wch: 15 }  // Security Status
+  ];
+  XLSX.utils.book_append_sheet(wb, systemWs, 'System Performance');
+
+  // 6. Executive Summary Sheet
+  const totalAnomalies = anomalies.length;
+  const totalCost = data.slice(-selectedTimeRange).reduce((sum, d) => sum + (d.energyConsumption * 0.12), 0);
+  const avgSystemHealth = Math.round((data.slice(-selectedTimeRange).filter(d => d.hvacEfficiency > 80 && d.lightingEfficiency > 85).length / data.slice(-selectedTimeRange).length) * 100);
+  
+  const executiveSummary = [
+    { 'Metric': 'Report Period', 'Value': `${selectedTimeRange} days` },
+    { 'Metric': 'Buildings Monitored', 'Value': buildings.length },
+    { 'Metric': 'Total Data Points', 'Value': data.slice(-selectedTimeRange).length },
+    { 'Metric': 'Total Energy Consumption', 'Value': `${Math.round(data.slice(-selectedTimeRange).reduce((sum, d) => sum + d.energyConsumption, 0))} kWh` },
+    { 'Metric': 'Total Cost', 'Value': `$${Math.round(totalCost * 100) / 100}` },
+    { 'Metric': 'Average System Health', 'Value': `${avgSystemHealth}%` },
+    { 'Metric': 'Total Anomalies', 'Value': totalAnomalies },
+    { 'Metric': 'High Severity Anomalies', 'Value': anomalies.filter(a => a.severity === 'high').length },
+    { 'Metric': 'ML Predictions Generated', 'Value': predictions.length },
+    { 'Metric': 'Report Generated', 'Value': new Date().toLocaleString() }
+  ];
+  
+  const executiveWs = XLSX.utils.json_to_sheet(executiveSummary);
+  executiveWs['!cols'] = [{ wch: 25 }, { wch: 20 }];
+  XLSX.utils.book_append_sheet(wb, executiveWs, 'Executive Summary');
+
+  // Generate filename with timestamp
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  const filename = `building_performance_report_${timestamp}.xlsx`;
+
+  // Save the file
+  XLSX.writeFile(wb, filename);
+};
 
 // Advanced ML Models Implementation
 class AdvancedMLModels {
@@ -207,6 +608,9 @@ const BuildingDashboard = () => {
   const [clusters, setClusters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showBuildingLayout, setShowBuildingLayout] = useState(false);
+  const [selectedBuildingInLayout, setSelectedBuildingInLayout] = useState(null);
+  const [notification, setNotification] = useState(null);
   const [settings, setSettings] = useState({
     refreshInterval: 30,
     alertThresholds: {
@@ -241,6 +645,43 @@ const BuildingDashboard = () => {
     const entries = Object.entries(buildingMapping);
     const entry = entries.find(([apiId, display]) => display === displayName);
     return entry ? entry[0] : displayName.toLowerCase().replace(' ', '_');
+  };
+
+  // Building layout handlers
+  const handleBuildingLayoutClick = () => {
+    setShowBuildingLayout(true);
+  };
+
+  const handleBuildingClick = (buildingName) => {
+    setSelectedBuildingInLayout(buildingName);
+  };
+
+  const handleCloseBuildingLayout = () => {
+    setShowBuildingLayout(false);
+    setSelectedBuildingInLayout(null);
+  };
+
+  const handleExportReport = () => {
+    try {
+      const buildings = getBuildingDisplayNames(currentUser?.buildings || ['building_a', 'building_b', 'building_c', 'building_d']);
+      exportDashboardToExcel(data, anomalies, predictions, buildings, selectedTimeRange);
+      setNotification({
+        type: 'success',
+        message: `Comprehensive building performance report exported successfully!`,
+        timestamp: new Date()
+      });
+      // Auto-hide notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      setNotification({
+        type: 'error',
+        message: 'Failed to export report. Please try again.',
+        timestamp: new Date()
+      });
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    }
   };
 
   const handleLogin = (user) => {
@@ -470,9 +911,12 @@ const BuildingDashboard = () => {
                 </select>
               </div>
               <div className="col-md-3 d-flex align-items-end">
-                <button className="btn btn-primary w-100">
+                <button 
+                  className="btn btn-primary w-100"
+                  onClick={handleExportReport}
+                >
                   <i className="bi bi-download me-2"></i>
-                  Export Report
+                  Export Full Report
                 </button>
               </div>
             </div>
@@ -533,13 +977,18 @@ const BuildingDashboard = () => {
           </div>
 
           <div className="col-md-3">
-            <div className="card shadow-sm h-100">
+            <div 
+              className="card shadow-sm h-100 cursor-pointer hover:shadow-md transition-shadow duration-200"
+              onClick={handleBuildingLayoutClick}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-start">
                   <div>
                     <p className="text-muted small mb-1">Anomalies</p>
                     <h3 className="h4 fw-bold mb-1">{anomalies.length}</h3>
                     <p className="text-muted small mb-0">Random Forest Detection</p>
+                    <p className="text-muted small mb-0 text-blue-600">Click to view building layout</p>
                   </div>
                   <div className="p-2 rounded bg-danger">
                     <i className="bi bi-exclamation-triangle text-white"></i>
@@ -1329,6 +1778,133 @@ const BuildingDashboard = () => {
                   }}
                 >
                   Save Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Building Layout Modal */}
+      {showBuildingLayout && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-xl">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">
+                  <Building className="me-2" size={20} />
+                  Interactive Building Layout - Anomaly Overview
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleCloseBuildingLayout}
+                ></button>
+              </div>
+              
+              {/* Notification */}
+              {notification && (
+                <div className={`alert alert-${notification.type === 'success' ? 'success' : 'danger'} alert-dismissible fade show m-3`} role="alert">
+                  <div className="d-flex align-items-center">
+                    {notification.type === 'success' ? (
+                      <svg className="bi flex-shrink-0 me-2" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                      </svg>
+                    ) : (
+                      <svg className="bi flex-shrink-0 me-2" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                      </svg>
+                    )}
+                    <span>{notification.message}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setNotification(null)}
+                  ></button>
+                </div>
+              )}
+              <div className="modal-body">
+                <div className="row">
+                  <div className="col-lg-8">
+                    <BuildingLayout
+                      buildings={getBuildingDisplayNames(currentUser?.buildings || ['building_a', 'building_b', 'building_c', 'building_d'])}
+                      anomalies={anomalies}
+                      onBuildingClick={handleBuildingClick}
+                      selectedBuilding={selectedBuildingInLayout}
+                    />
+                  </div>
+                  <div className="col-lg-4">
+                    <div className="bg-light rounded-lg p-4 h-100">
+                      <h6 className="fw-bold mb-3">Anomaly Summary</h6>
+                      {selectedBuildingInLayout ? (
+                        <div>
+                          <h6 className="text-primary mb-2">{selectedBuildingInLayout}</h6>
+                          {anomalies.filter(a => a.building === selectedBuildingInLayout).length > 0 ? (
+                            <div>
+                              <p className="text-sm text-muted mb-3">
+                                {anomalies.filter(a => a.building === selectedBuildingInLayout).length} anomaly(ies) detected
+                              </p>
+                              <div className="space-y-2">
+                                {anomalies
+                                  .filter(a => a.building === selectedBuildingInLayout)
+                                  .slice(0, 5)
+                                  .map((anomaly, index) => (
+                                    <div key={index} className="bg-white rounded p-3 border">
+                                      <div className="d-flex justify-content-between align-items-start mb-1">
+                                        <span className="badge bg-danger text-white text-xs">
+                                          {anomaly.severity.toUpperCase()}
+                                        </span>
+                                        <small className="text-muted">
+                                          {new Date(anomaly.date).toLocaleDateString()}
+                                        </small>
+                                      </div>
+                                      <p className="text-sm font-medium mb-1">
+                                        {anomaly.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                      </p>
+                                      <p className="text-xs text-muted mb-0">
+                                        Energy: {anomaly.energy} kWh | Temp: {anomaly.temperature}°F | Occupancy: {anomaly.occupancy}%
+                                      </p>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center py-4">
+                              <div className="text-success mb-2">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <p className="text-sm text-muted">No anomalies detected in this building</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <MapPin className="text-muted mb-2" size={32} />
+                          <p className="text-sm text-muted">Click on a building to view its anomaly details</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleCloseBuildingLayout}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleExportReport}
+                >
+                  <Download className="me-2" size={16} />
+                  Export to Excel
                 </button>
               </div>
             </div>
