@@ -15,11 +15,13 @@
     "setup-windows": "setup-windows.bat"
   },
   "dependencies": {
+    "file-saver": "^2.0.5",
+    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "recharts": "^2.8.0",
-    "lucide-react": "^0.263.1"
+    "xlsx": "^0.18.5"
   },
   "browserslist": {
     "production": [
@@ -33,4 +35,4 @@
       "last 1 safari version"
     ]
   }
-} 
+}
