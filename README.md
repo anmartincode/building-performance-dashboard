@@ -46,6 +46,35 @@ Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
                               AI/ML Models
 ```
 
+## 📁 Project Structure
+
+```
+building-performance-dashboard/
+├── backend/                 # Python Flask backend
+│   ├── main.py             # Main Flask application
+│   ├── database.py         # Database models and operations
+│   ├── services.py         # Business logic services
+│   ├── ai_models.py        # AI/ML model integration
+│   ├── requirements.txt    # Python dependencies
+│   └── README.md          # Backend-specific documentation
+├── src/                    # Frontend React application
+│   ├── dashboard.js        # Main dashboard component
+│   ├── api.js             # API integration
+│   └── index.js           # Application entry point
+├── public/                 # Static assets
+├── scripts/                # Setup and startup scripts
+│   ├── README.md          # Scripts documentation
+│   ├── start-servers.*    # Platform-specific startup scripts
+│   └── setup-*            # Setup scripts
+├── docs/                   # Documentation
+│   ├── README.md          # Documentation index
+│   ├── VENV_SETUP.md      # Virtual environment setup
+│   ├── WINDOWS_SETUP.md   # Windows setup guide
+│   └── WINDOWS_OPTIMIZATIONS.md # Windows optimizations
+├── package.json           # Node.js dependencies
+└── README.md              # Main project README
+```
+
 ## 💻 Cross-Platform Compatibility
 
 This application is designed to work across multiple platforms:
@@ -61,12 +90,12 @@ This application is designed to work across multiple platforms:
 - **Universal**: Python and Node.js applications work on all platforms
 
 ### 📁 Platform-Specific Files
-- `start-servers.sh` - macOS/Linux startup script
-- `start-servers.bat` - Windows Command Prompt startup script  
-- `start-servers.ps1` - Windows PowerShell startup script
-- `setup-windows.bat` - Windows automated setup
-- `setup_database_windows.py` - Windows database setup
-- `WINDOWS_SETUP.md` - Comprehensive Windows guide
+- `scripts/start-servers.sh` - macOS/Linux startup script
+- `scripts/start-servers.bat` - Windows Command Prompt startup script  
+- `scripts/start-servers.ps1` - Windows PowerShell startup script
+- `scripts/setup-windows.bat` - Windows automated setup
+- `backend/setup_database_windows.py` - Windows database setup
+- `docs/WINDOWS_SETUP.md` - Comprehensive Windows guide
 
 ### Frontend (React)
 - **Location**: `src/`
@@ -96,7 +125,7 @@ This application is designed to work across multiple platforms:
 ### Prerequisites
 
 > **📋 Platform-Specific Setup**
-> - **Windows**: See [WINDOWS_SETUP.md](WINDOWS_SETUP.md) for detailed Windows installation guide
+> - **Windows**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for detailed Windows installation guide
 > - **macOS/Linux**: Follow the instructions below
 
 1. **Install MySQL**
@@ -123,10 +152,10 @@ git clone <repository-url>
 cd building-performance-dashboard
 
 # Run cross-platform setup
-npm run setup
+node scripts/setup.js
 
 # Start both servers
-npm run start-servers
+node scripts/start-servers.js
 ```
 
 #### macOS/Linux
@@ -141,7 +170,7 @@ python3 setup_database.py
 
 # Start both servers
 cd ..
-./start-servers.sh
+./scripts/start-servers.sh
 ```
 
 #### Windows
@@ -151,10 +180,10 @@ git clone <repository-url>
 cd building-performance-dashboard
 
 # Run automated setup
-setup-windows.bat
+scripts\setup-windows.bat
 
 # Start both servers
-start-servers.bat
+scripts\start-servers.bat
 ```
 
 ### Option 2: Manual Setup
