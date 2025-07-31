@@ -10,6 +10,7 @@
     "eject": "react-scripts eject",
     "setup": "node setup.js",
     "start-servers": "node start-servers.js",
+    "start-servers-venv": "./start-servers-venv.sh",
     "start-windows": "start-servers.bat",
     "start-mac": "./start-servers.sh",
     "setup-windows": "setup-windows.bat"
