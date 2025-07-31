@@ -10,7 +10,6 @@ An AI-powered building management system with real-time monitoring, predictive a
 - [💻 Cross-Platform Compatibility](#-cross-platform-compatibility)
 - [🚀 Quick Start](#-quick-start)
 - [🌐 Access Points](#-access-points)
-- [🔐 Demo Accounts](#-demo-accounts)
 - [🗄️ Database Schema](#️-database-schema-1)
 - [🔧 API Endpoints](#-api-endpoints-1)
 - [🤖 AI/ML Features](#-ai-ml-features-1)
@@ -253,15 +252,6 @@ npm start
 - **Frontend Dashboard**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
-
-## 🔐 Demo Accounts
-
-| Role | Username | Password |
-|------|----------|----------|
-| **Admin** | `admin` | `admin123` |
-| **Manager** | `facility_manager` | `fm123` |
-| **Technician** | `technician` | `tech123` |
-| **Viewer** | `guest` | `guest123` |
 
 ## 📁 Project Structure
 
