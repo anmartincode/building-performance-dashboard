@@ -12,7 +12,7 @@ const BuildingDashboard = dynamic(() => import('@/components/BuildingDashboard')
       alignItems: 'center', 
       height: '100vh',
       fontSize: '1.2rem',
-      color: '#666'
+      color: '#839496' // Solarized base0 color
     }}>
       Loading Dashboard...
     </div>

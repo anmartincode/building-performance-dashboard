@@ -74,28 +74,28 @@ const BuildingLayoutComponent = ({ buildings, anomalies, onBuildingClick, select
       position: { x: 50, y: 50 },
       size: { width: 140, height: 100 },
       floors: 3,
-      color: '#3b82f6',
+      color: '#268bd2', // Solarized blue
       name: 'Building A'
     },
     'Building B': {
       position: { x: 250, y: 50 },
       size: { width: 140, height: 100 },
       floors: 2,
-      color: '#10b981',
+      color: '#2aa198', // Solarized cyan
       name: 'Building B'
     },
     'Building C': {
       position: { x: 50, y: 200 },
       size: { width: 140, height: 100 },
       floors: 4,
-      color: '#f59e0b',
+      color: '#b58900', // Solarized yellow
       name: 'Building C'
     },
     'Building D': {
       position: { x: 250, y: 200 },
       size: { width: 140, height: 100 },
       floors: 2,
-      color: '#8b5cf6',
+      color: '#6c71c4', // Solarized violet
       name: 'Building D'
     }
   };
@@ -106,10 +106,10 @@ const BuildingLayoutComponent = ({ buildings, anomalies, onBuildingClick, select
 
   const getAnomalyColor = (severity) => {
     switch (severity) {
-      case 'high': return '#ef4444';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
+      case 'high': return '#dc322f'; // Solarized red
+      case 'medium': return '#cb4b16'; // Solarized orange
+      case 'low': return '#859900'; // Solarized green
+      default: return '#586e75'; // Solarized base01
     }
   };
 
@@ -795,18 +795,27 @@ const BuildingDashboard = () => {
                 <Box sx={{ height: 400 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={filteredData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#586e75" opacity={0.3} />
+                      <XAxis dataKey="date" stroke="#839496" />
+                      <YAxis stroke="#839496" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: '#073642',
+                          border: '1px solid #586e75',
+                          borderRadius: '8px',
+                          color: '#839496'
+                        }}
+                      />
                       <Legend />
                       <Line 
                         type="monotone" 
                         dataKey={selectedSystem === 'energy' ? 'energyConsumption' : 
                                 selectedSystem === 'hvac' ? 'hvacEfficiency' :
                                 selectedSystem === 'lighting' ? 'lightingEfficiency' : 'occupancy'} 
-                        stroke="#1976d2" 
-                        strokeWidth={2}
+                        stroke="#268bd2" 
+                        strokeWidth={3}
+                        dot={{ fill: '#268bd2', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#268bd2', strokeWidth: 2 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -833,14 +842,23 @@ const BuildingDashboard = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
-                        fill="#8884d8"
+                        fill="#268bd2"
                         dataKey="value"
+                        stroke="#073642"
+                        strokeWidth={2}
                       >
-                        <Cell fill="#8884d8" />
-                        <Cell fill="#82ca9d" />
-                        <Cell fill="#ffc658" />
+                        <Cell fill="#268bd2" /> {/* Solarized blue */}
+                        <Cell fill="#2aa198" /> {/* Solarized cyan */}
+                        <Cell fill="#b58900" /> {/* Solarized yellow */}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: '#073642',
+                          border: '1px solid #586e75',
+                          borderRadius: '8px',
+                          color: '#839496'
+                        }}
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
