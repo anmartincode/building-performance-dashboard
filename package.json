@@ -9,11 +9,11 @@
     "start": "next start",
     "lint": "next lint",
     "setup": "node setup.js",
-    "start-servers": "node start-servers.js",
-    "start-servers-venv": "./start-servers-venv.sh",
-    "start-windows": "start-servers.bat",
-    "start-mac": "./start-servers.sh",
-    "setup-windows": "setup-windows.bat"
+    "start-servers": "node scripts/start-servers.js",
+    "start-servers-venv": "./scripts/start-servers-venv.sh",
+    "start-windows": "scripts/start-servers.bat",
+    "start-mac": "./scripts/start-servers.sh",
+    "setup-windows": "scripts/setup-windows.bat"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
