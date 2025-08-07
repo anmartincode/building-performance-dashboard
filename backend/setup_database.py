@@ -105,7 +105,7 @@ def create_env_file():
     if not os.path.exists(env_file):
         print(" Creating .env file...")
         env_content = """# Database Configuration
-DATABASE_URL=mysql+pymysql://root:password@localhost:3306/building_dashboard
+DATABASE_URL=mysql+pymysql://root@localhost:3306/building_dashboard
 
 # Security
 SECRET_KEY=your-super-secret-key-change-this-in-production
@@ -120,13 +120,13 @@ MODEL_PATH=./models
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
 MYSQL_USER=root
-MYSQL_PASSWORD=password
+MYSQL_PASSWORD=
 MYSQL_DATABASE=building_dashboard
 """
         with open(env_file, 'w') as f:
             f.write(env_content)
         print(" .env file created")
-        print("  Please update the MySQL password in .env file if different from 'password'")
+        print("  MySQL configured without password (root user)")
     else:
         print(" .env file already exists")
 

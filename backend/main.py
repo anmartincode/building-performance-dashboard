@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import json
 import random
+import os
 
 # Import database and services
 from database import get_db, init_db
@@ -328,7 +329,7 @@ async def initialize_database():
 @app.on_event("startup")
 async def startup_event():
     print("🚀 Starting Building Performance Dashboard API with MySQL Database")
-    print("📊 Database URL:", "mysql+pymysql://root:password@localhost:3306/building_dashboard")
+    print("📊 Database URL:", os.getenv("DATABASE_URL", "mysql+pymysql://root@localhost:3306/building_dashboard"))
     print("🔧 API Documentation available at: http://localhost:8000/docs")
 
 if __name__ == "__main__":
