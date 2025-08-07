@@ -1,487 +1,190 @@
-# 🏢 Building Performance Dashboard
+# Building Performance Dashboard
 
-An AI-powered building management system with real-time monitoring, predictive analytics, intelligent automation, and **MySQL database integration**.
-
-## 📋 Table of Contents
-
-- [🚀 Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [📁 Project Structure](#-project-structure)
-- [💻 Cross-Platform Compatibility](#-cross-platform-compatibility)
-- [🚀 Quick Start](#-quick-start)
-- [🌐 Access Points](#-access-points)
-- [🗄️ Database Schema](#️-database-schema-1)
-- [🔧 API Endpoints](#-api-endpoints-1)
-- [🤖 AI/ML Features](#-ai-ml-features-1)
-- [🛠️ Development](#️-development-1)
-- [🚀 Production Deployment](#-production-deployment)
-- [📊 Data Flow](#-data-flow)
-- [🔒 Security Features](#-security-features)
-- [📈 Performance](#-performance)
-- [🐛 Troubleshooting](#-troubleshooting)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-
----
+An AI-Powered Building Management Dashboard built with **Next.js** and **Material UI**.
 
 ## 🚀 Features
 
-### 🔐 Multi-User Authentication
-- Role-based access control (Admin, Manager, Technician, Viewer)
-- Secure JWT-based authentication with bcrypt password hashing
-- Permission-based feature access
-- Persistent user management
+- **Real-time Building Monitoring**: Track energy consumption, HVAC efficiency, lighting, and occupancy across multiple buildings
+- **AI-Powered Anomaly Detection**: Advanced machine learning algorithms detect unusual patterns in building data
+- **Predictive Analytics**: LSTM-based forecasting for energy consumption and system performance
+- **Interactive Building Layout**: Visual representation of building locations with anomaly indicators
+- **Comprehensive Reporting**: Export detailed performance reports to Excel
+- **Responsive Design**: Modern Material UI interface that works on all devices
+- **Real-time Notifications**: Configurable alerts for critical events
 
-### 📊 Real-Time Monitoring
-- Live sensor data from multiple buildings
-- HVAC, Lighting, and Security system monitoring
-- Energy consumption tracking
-- Occupancy analytics
-- **Persistent data storage in MySQL**
+## 🛠️ Tech Stack
 
-### 🤖 AI/ML Capabilities
-- **LSTM Neural Networks** for energy consumption prediction
-- **Random Forest** anomaly detection
-- **K-means clustering** for usage pattern analysis
-- Real-time predictive analytics
-- **ML model persistence and caching**
-
-### 🎨 Modern UI/UX
-- Responsive design with Tailwind CSS
-- Interactive charts and visualizations
-- Real-time data updates
-- Mobile-friendly interface
-
-### 🗄️ Database Features
-- **MySQL database integration**
-- Persistent data storage
-- User management and authentication
-- Building and sensor data management
-- Anomaly and prediction history
-- Role-based access control
-
-## 🏗️ Architecture
-
-```
-Frontend (React) ←→ Backend (Python FastAPI) ←→ MySQL Database
-                                    ↓
-                              AI/ML Models
-```
-
-## 📁 Project Structure
-
-```
-building-performance-dashboard/
-├── backend/                 # Python Flask backend
-│   ├── main.py             # Main Flask application
-│   ├── database.py         # Database models and operations
-│   ├── services.py         # Business logic services
-│   ├── ai_models.py        # AI/ML model integration
-│   ├── requirements.txt    # Python dependencies
-│   └── README.md          # Backend-specific documentation
-├── src/                    # Frontend React application
-│   ├── dashboard.js        # Main dashboard component
-│   ├── api.js             # API integration
-│   └── index.js           # Application entry point
-├── public/                 # Static assets
-├── scripts/                # Setup and startup scripts
-│   ├── README.md          # Scripts documentation
-│   ├── start-servers.*    # Platform-specific startup scripts
-│   └── setup-*            # Setup scripts
-├── docs/                   # Documentation
-│   ├── README.md          # Documentation index
-│   ├── VENV_SETUP.md      # Virtual environment setup
-│   ├── WINDOWS_SETUP.md   # Windows setup guide
-│   └── WINDOWS_OPTIMIZATIONS.md # Windows optimizations
-├── package.json           # Node.js dependencies
-└── README.md              # Main project README
-```
-
-## 💻 Cross-Platform Compatibility
-
-This application is designed to work across multiple platforms:
-
-### ✅ Supported Platforms
-- **Windows 10/11** (with Windows Scripts)
-- **macOS** (Intel & Apple Silicon)
-- **Linux** (Ubuntu, Debian, CentOS)
-
-### 🔧 Platform-Specific Features
-- **Windows**: Batch files (`.bat`) and PowerShell scripts (`.ps1`)
-- **macOS/Linux**: Bash scripts (`.sh`)
-- **Universal**: Python and Node.js applications work on all platforms
-
-### 📁 Platform-Specific Files
-- `scripts/start-servers.sh` - macOS/Linux startup script
-- `scripts/start-servers.bat` - Windows Command Prompt startup script  
-- `scripts/start-servers.ps1` - Windows PowerShell startup script
-- `scripts/setup-windows.bat` - Windows automated setup
-- `backend/setup_database_windows.py` - Windows database setup
-- `docs/WINDOWS_SETUP.md` - Comprehensive Windows guide
-
-### Frontend (React)
-- **Location**: `src/`
-- **Port**: 3000
-- **Framework**: React 18 with Hooks
-- **Styling**: Tailwind CSS
+- **Frontend**: Next.js 14, React 18
+- **UI Framework**: Material UI (MUI) v5
 - **Charts**: Recharts
-- **Icons**: Lucide React
+- **Data Processing**: Advanced ML models (LSTM, Random Forest, K-means clustering)
+- **Export**: XLSX for Excel report generation
+- **Icons**: Material Icons and Lucide React
 
-### Backend (Python FastAPI)
-- **Location**: `backend/`
-- **Port**: 8000
-- **Framework**: FastAPI
-- **ML Libraries**: scikit-learn, pandas, numpy
-- **Authentication**: JWT tokens with bcrypt
-- **Database**: MySQL with SQLAlchemy ORM
-- **Documentation**: Auto-generated Swagger UI
+## 📦 Installation
 
-### Database (MySQL)
-- **Type**: MySQL 8.0+
-- **ORM**: SQLAlchemy
-- **Features**: User management, sensor data, predictions, anomalies
-- **Security**: Password hashing, role-based access
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-> **📋 Platform-Specific Setup**
-> - **Windows**: See [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) for detailed Windows installation guide
-> - **macOS/Linux**: Follow the instructions below
-
-1. **Install MySQL**
+1. **Clone the repository**:
    ```bash
-   # macOS
-   brew install mysql
-   brew services start mysql
-   
-   # Ubuntu/Debian
-   sudo apt-get install mysql-server
-   sudo systemctl start mysql
-   
-   # Windows: Download from https://dev.mysql.com/downloads/
+   git clone <repository-url>
+   cd building-performance-dashboard
    ```
 
-2. **Install Node.js and npm** (if not already installed)
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-### Option 1: Automated Setup (Recommended)
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-#### Cross-Platform (All OS)
-```bash
-# Clone the repository
-git clone <repository-url>
-cd building-performance-dashboard
+4. **Open your browser** and navigate to `http://localhost:3000`
 
-# Run cross-platform setup
-node scripts/setup.js
-
-# Start both servers
-node scripts/start-servers.js
-```
-
-#### macOS/Linux
-```bash
-# Clone the repository
-git clone <repository-url>
-cd building-performance-dashboard
-
-# Setup database and backend
-cd backend
-python3 setup_database.py
-
-# Start both servers
-cd ..
-./scripts/start-servers.sh
-```
-
-#### Windows
-```cmd
-# Clone the repository
-git clone <repository-url>
-cd building-performance-dashboard
-
-# Run automated setup
-scripts\setup-windows.bat
-
-# Start both servers
-scripts\start-servers.bat
-```
-
-### Option 2: Manual Setup
-
-#### macOS/Linux
-```bash
-# 1. Setup Database
-cd backend
-python3 setup_database.py
-
-# 2. Install Frontend Dependencies
-cd ..
-npm install
-
-# 3. Start the Backend
-cd backend
-python3 main.py
-
-# 4. Start the Frontend (in new terminal)
-export PATH="/opt/homebrew/bin:$PATH"
-npm start
-```
-
-#### Windows
-```cmd
-# 1. Setup Database
-cd backend
-python setup_database_windows.py
-
-# 2. Install Frontend Dependencies
-cd ..
-npm install
-
-# 3. Start the Backend
-cd backend
-python main.py
-
-# 4. Start the Frontend (in new terminal)
-npm start
-```
-
-## 🌐 Access Points
-
-- **Frontend Dashboard**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
-building-performance-dashboard/
-├── src/                           # React frontend
-│   ├── dashboard.js              # Main dashboard component
-│   ├── api.js                   # API service layer
-│   └── index.js                 # React entry point
-├── backend/                      # Python FastAPI backend
-│   ├── main.py                  # FastAPI application
-│   ├── database.py              # Database models and configuration
-│   ├── services.py              # Business logic and database operations
-│   ├── ai_models.py             # ML models and algorithms
-│   ├── setup_database.py        # Database setup script (macOS/Linux)
-│   ├── setup_database_windows.py # Database setup script (Windows)
-│   ├── requirements.txt         # Python dependencies
-│   ├── env.example              # Environment configuration template
-│   └── README.md                # Backend documentation
-├── public/                      # Static assets
-├── package.json                 # Node.js dependencies
-├── start-servers.sh             # Server startup script (macOS/Linux)
-├── start-servers.bat            # Server startup script (Windows CMD)
-├── start-servers.ps1            # Server startup script (Windows PowerShell)
-├── start-servers.js             # Cross-platform server launcher
-├── setup.js                     # Cross-platform setup script
-├── setup-windows.bat            # Windows setup script
-├── WINDOWS_SETUP.md             # Windows setup guide
-└── README.md                   # This file
+src/
+├── app/                    # Next.js app directory
+│   ├── layout.js          # Root layout with Material UI theme
+│   └── page.js            # Main dashboard page
+├── components/            # React components
+│   └── BuildingDashboard.js  # Main dashboard component
+├── utils/                 # Utility functions
+│   └── api.js            # API service functions
+└── styles/               # Global styles (if needed)
+```
 
-## 🗄️ Database Schema
+## 🎯 Key Components
 
-### Core Tables
-- **Users**: User accounts and authentication
-- **Buildings**: Building information and metadata
-- **UserBuilding**: Many-to-many user-building relationships
-- **SensorData**: Real-time sensor readings
-- **Anomalies**: Detected anomalies and alerts
-- **Predictions**: ML model predictions
-- **SystemEvents**: System events and maintenance
+### BuildingDashboard
+The main dashboard component featuring:
+- **Stats Cards**: Real-time metrics for energy, HVAC, lighting, and occupancy
+- **Interactive Charts**: Line charts for performance trends and pie charts for energy distribution
+- **Anomaly Detection**: Visual indicators for detected issues with severity levels
+- **Building Layout**: Interactive map showing building locations and anomaly status
+- **Settings Panel**: Configurable thresholds and notification preferences
 
-## 🔧 API Endpoints
+### Material UI Integration
+- **Theme Provider**: Custom Material UI theme with building-specific color palette
+- **Responsive Grid**: Adaptive layout that works on desktop, tablet, and mobile
+- **Modern Components**: Cards, dialogs, snackbars, and form controls
+- **Icon Integration**: Material Icons for consistent visual language
 
-### Authentication
-- `POST /api/auth/login` - User authentication with JWT
-
-### Building Management
-- `GET /api/buildings` - Get user's accessible buildings
-- `GET /api/buildings/{id}/data` - Get building sensor data
-- `POST /api/buildings/{id}/sensor-data` - Create new sensor data
-
-### AI/ML Features
-- `POST /api/predictions` - Get LSTM predictions
-- `GET /api/anomalies/{id}` - Get anomaly detection results
-- `POST /api/anomalies/{id}` - Create new anomaly
-
-### User Management
-- `GET /api/users/me` - Get current user info
-- `GET /api/users/me/buildings` - Get user's buildings
-
-### System
-- `GET /api/health` - Health check with database status
-- `POST /api/init-db` - Initialize database tables
-
-## 🤖 AI/ML Features
-
-### 1. LSTM Neural Networks
-- **Purpose**: Energy consumption forecasting
-- **Input**: Historical sensor data from MySQL
-- **Output**: 24-hour predictions with confidence scores
-- **Features**: Business hours, weekly patterns, seasonal trends
-
-### 2. Random Forest Anomaly Detection
-- **Purpose**: Real-time anomaly detection
-- **Input**: Multi-sensor data streams from database
-- **Output**: Anomaly scores and classifications
-- **Features**: Temperature spikes, energy anomalies, occupancy patterns
-
-### 3. K-means Clustering
-- **Purpose**: Usage pattern analysis
-- **Input**: Building behavior data from MySQL
-- **Output**: Pattern classifications
-- **Features**: High/low activity detection, optimization recommendations
-
-## 🛠️ Development
-
-### Adding New Features
-
-1. **Database Models**: Add to `backend/database.py`
-2. **Business Logic**: Add to `backend/services.py`
-3. **API Endpoints**: Add to `backend/main.py`
-4. **Frontend**: Update components in `src/dashboard.js`
-5. **API Integration**: Use `src/api.js` for communication
+## 🔧 Configuration
 
 ### Environment Variables
+Create a `.env.local` file in the root directory:
 
-Create `.env` files for configuration:
-
-**Backend (.env):**
 ```env
-# Database Configuration
-DATABASE_URL=mysql+pymysql://username:password@localhost:3306/building_dashboard
-
-# Security
-SECRET_KEY=your-super-secret-key-change-this-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Application Settings
-DEBUG=True
-MODEL_PATH=./models
-
-# MySQL Connection Settings
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=your-mysql-password
-MYSQL_DATABASE=building_dashboard
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_ENABLE_SYNTHETIC_DATA=true
 ```
 
-### Testing the API
+### Building Configuration
+Modify building settings in `src/components/BuildingDashboard.js`:
 
-```bash
-# Health check
-curl http://localhost:8000/api/health
-
-# Login
-curl -X POST http://localhost:8000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
-
-# Get building data (with auth token)
-curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  http://localhost:8000/api/buildings/building_a/data
+```javascript
+const buildingMapping = {
+  'building_a': 'Building A',
+  'building_b': 'Building B', 
+  'building_c': 'Building C',
+  'building_d': 'Building D'
+};
 ```
 
-## 🚀 Production Deployment
+## 📊 Data Sources
 
-### Database Setup
-```bash
-# Create production database
-mysql -u root -p -e "CREATE DATABASE building_dashboard_prod;"
+The dashboard supports multiple data sources:
 
-# Create production user
-mysql -u root -p -e "CREATE USER 'dashboard_user'@'localhost' IDENTIFIED BY 'secure_password';"
-mysql -u root -p -e "GRANT ALL PRIVILEGES ON building_dashboard_prod.* TO 'dashboard_user'@'localhost';"
-mysql -u root -p -e "FLUSH PRIVILEGES;"
-```
+1. **Real API Integration**: Connect to your building management system APIs
+2. **Synthetic Data**: Built-in data generation for testing and demonstration
+3. **CSV Import**: Upload historical data files
+4. **Real-time Sensors**: IoT device integration
 
-### Frontend
-```bash
-npm run build
-# Deploy build/ folder to your web server
-```
+## 🤖 AI Features
 
-### Backend
-```bash
-pip3 install gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
+### Anomaly Detection
+- **Energy Spikes**: Detect unusual energy consumption patterns
+- **Temperature Anomalies**: Identify HVAC system issues
+- **Occupancy Patterns**: Monitor unusual building usage
 
-### Environment Configuration
-```env
-DATABASE_URL=mysql+pymysql://dashboard_user:secure_password@localhost:3306/building_dashboard_prod
-SECRET_KEY=your-production-secret-key
-DEBUG=False
-```
+### Predictive Analytics
+- **LSTM Forecasting**: 7-day energy consumption predictions
+- **Trend Analysis**: Identify long-term performance patterns
+- **Confidence Scoring**: Measure prediction reliability
 
-## 📊 Data Flow
+### Clustering Analysis
+- **K-means Clustering**: Group similar building performance patterns
+- **Pattern Recognition**: Identify operational modes
+- **Optimization Insights**: Suggest efficiency improvements
 
-1. **Sensors** → **API Endpoints** → **MySQL Database** → **AI Models** → **Frontend Dashboard**
-2. **User Actions** → **Frontend** → **Backend API** → **MySQL Database** → **ML Processing**
-3. **Real-time Updates** → **Database Triggers** → **WebSocket/SSE** → **Frontend Charts**
+## 📱 Responsive Design
 
-## 🔒 Security Features
+The dashboard is fully responsive and optimized for:
+- **Desktop**: Full-featured interface with all charts and controls
+- **Tablet**: Adaptive layout with touch-friendly controls
+- **Mobile**: Streamlined interface with essential features
 
-- JWT token authentication with expiration
-- Password hashing with bcrypt
-- Role-based access control
-- SQL injection protection with SQLAlchemy
-- CORS protection
-- Input validation with Pydantic
-- Secure environment variable handling
+## 🚀 Deployment
 
-## 📈 Performance
+### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables
+3. Deploy automatically on push
 
-- **Frontend**: React 18 with optimized rendering
-- **Backend**: FastAPI with async/await
-- **Database**: Optimized MySQL queries with indexes
-- **ML Models**: Cached predictions and efficient algorithms
-- **Real-time**: Efficient data streaming
+### Other Platforms
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- AWS Amplify
+- Google Cloud Run
+- Docker containers
 
-## 🐛 Troubleshooting
+## 🔒 Security
 
-### Common Issues
-
-1. **MySQL Connection Failed**
-   - Check MySQL service is running
-   - Verify credentials in `.env` file
-   - Ensure database exists
-
-2. **Database Setup Issues**
-   - Run: `cd backend && python3 setup_database.py`
-   - Check MySQL permissions
-   - Verify database exists
-
-3. **Import Errors**
-   - Install dependencies: `pip3 install -r requirements.txt`
-   - Check Python path and virtual environment
-
-4. **Authentication Issues**
-   - Check JWT token expiration
-   - Verify user exists in database
-   - Check password hashing
-
-### Debug Mode
-Set `DEBUG=True` in `.env` for detailed error messages and SQL query logging.
+- **Client-side Only**: No sensitive data stored on the server
+- **API Security**: Secure API endpoints with authentication
+- **Data Privacy**: Local data processing for sensitive information
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Commit your changes: `git commit -am 'Add new feature'`
+4. Push to the branch: `git push origin feature/new-feature`
 5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
+## 🆘 Support
 
-**Built with ❤️ using React, FastAPI, MySQL, and AI/ML technologies**
+For support and questions:
+- Create an issue in the GitHub repository
+- Check the documentation in the `/docs` folder
+- Review the component examples in `/src/components`
+
+## 🔄 Migration from Bootstrap
+
+This project has been migrated from Bootstrap to Material UI with the following improvements:
+
+### UI Framework Changes
+- **Bootstrap 5** → **Material UI v5**
+- **Create React App** → **Next.js 14**
+- **CDN Dependencies** → **NPM Packages**
+
+### Component Migrations
+- `btn` classes → Material UI `Button` components
+- `card` classes → Material UI `Card` components
+- `container` classes → Material UI `Container` components
+- `row/col` classes → Material UI `Grid` system
+- Bootstrap modals → Material UI `Dialog` components
+- Bootstrap alerts → Material UI `Alert` components
+
+### Benefits of Migration
+- **Better Performance**: Next.js optimization and Material UI tree-shaking
+- **Modern Design**: Material Design principles and consistent theming
+- **Type Safety**: Better TypeScript support and component props
+- **Accessibility**: Built-in ARIA support and keyboard navigation
+- **Customization**: Flexible theming system with design tokens
